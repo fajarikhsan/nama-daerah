@@ -1,5 +1,6 @@
 var lat = -2.352;
 var long = 116.348;
+var url = 'http://localhost/testmap/public/';
 
 // SHOW MAP
 var mymap = L.map('mapid').setView([lat, long], 5);
@@ -17,7 +18,7 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
 
 // SET MARKERS
 $.ajax({
-    url: 'http://localhost/testmap/public/home/getAllMarkers',
+    url: url + 'home/getAllMarkers',
     dataType: 'json',
     success: function(test) {
         $.each(test, function (i, val) {
@@ -50,7 +51,7 @@ $('#provinces').on('change', function() {
         mymap.setView([lat, long], 5);
     } else {
         $.ajax({
-            url: 'http://localhost/testmap/public/home/getProvince',
+            url: url + 'home/getProvince',
             data: {id: id},
             method: 'post',
             dataType: 'json',
@@ -60,7 +61,7 @@ $('#provinces').on('change', function() {
         });
     
         $.ajax({
-            url: 'http://localhost/testmap/public/home/getRegency',
+            url: url + 'home/getRegency',
             data: {id: id},
             method: 'post',
             dataType: 'json',
@@ -92,7 +93,7 @@ $('#regencies').on('change', function () {
         $('#villages').prop('disabled', true);
     } else {
         $.ajax({
-            url: 'http://localhost/testmap/public/home/getRegencyCoordinate',
+            url: url + 'home/getRegencyCoordinate',
             data: {id: id},
             method: 'post',
             dataType: 'json',
@@ -103,7 +104,7 @@ $('#regencies').on('change', function () {
         });
     
         $.ajax({
-            url: 'http://localhost/testmap/public/home/getDistrict',
+            url: url + 'home/getDistrict',
             data: {id: id},
             method: 'post',
             dataType: 'json',
@@ -126,7 +127,7 @@ $('#districts').on('change', function () {
         $('#villages').prop('disabled', true);
     } else {
         $.ajax({
-            url: 'http://localhost/testmap/public/home/getDistrictCoordinate',
+            url: url + 'home/getDistrictCoordinate',
             data: {id: id},
             method: 'post',
             dataType: 'json',
@@ -137,7 +138,7 @@ $('#districts').on('change', function () {
         });
     
         $.ajax({
-            url: 'http://localhost/testmap/public/home/getVillage',
+            url: url + 'home/getVillage',
             data: {id: id},
             method: 'post',
             dataType: 'json',
@@ -154,7 +155,7 @@ $('#districts').on('change', function () {
 $('#villages').on('change', function () {
     var id = $('#villages').val();
     $.ajax({
-        url: 'http://localhost/testmap/public/home/getVillageCoordinate',
+        url: url + 'home/getVillageCoordinate',
         data: {id: id},
         method: 'post',
         dataType: 'json',
