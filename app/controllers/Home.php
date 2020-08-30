@@ -3,9 +3,6 @@
 Class Home extends Controller {
     public function index() {
         $data['provinces'] = $this->model('Home_model')->getAllTableData('provinces');
-        $data['regencies'] = $this->model('Home_model')->getAllTableData('regencies');
-        $data['districts'] = $this->model('Home_model')->getAllTableData('districts');
-        $data['villages'] = $this->model('Home_model')->getAllTableData('villages');
         $this->view('home/index', $data);
     }
 
@@ -44,14 +41,66 @@ Class Home extends Controller {
         echo json_encode($this->model('Home_model')->getVillageById($id));
     }
 
-    public function generateFaker() {
-        $this->model('Home_model')->generateMarkers();
+    // GET HEATMAP DATA
+    public function getHeatmapData() {
+        // echo json_encode($this->model('Home_model')->getAllHeatmap());
+        // var_dump($this->model('Home_model')->getAllHeatmap());
+        $fp = fopen('heatmap-coordinate.json', 'w');
+        fwrite($fp, json_encode($this->model('Home_model')->getAllHeatmap()));
+        fclose($fp);
     }
 
+    public function getAllDatatablesData() {
+        $fetch_data = $this->model("Home_model")->getAllPeople();
+        $data = [];
+        foreach ( $fetch_data as $row ) {
+            $sub_array = [];
+            $sub_array[] = $row['id'];
+            $sub_array[] = $row['case_number'];
+            $sub_array[] = $row['case_order'];
+            $sub_array[] = $row['province_id'];
+            $sub_array[] = $row['regency_id'];
+            $sub_array[] = $row['district_id'];
+            $sub_array[] = $row['village_id'];
+            $sub_array[] = $row['lat'];
+            $sub_array[] = $row['lng'];
+            $sub_array[] = $row['created_at'];
+            $data[] = $sub_array;
+        }
+
+        $output = [
+            "draw" => intval($_POST['draw']),
+            "recordsTotal" => $this->model("Home_model")->get_all_data(),
+            "recordsFiltered" => $this->model("Home_model")->get_filtered_data()['id'],
+            "data" => $data
+        ];
+
+        echo json_encode($output);
+    }
+
+    public function getDatatablesData() {
+        // $record = $_POST['record'];
+        // $id = $_POST['id'];
+        echo json_encode($this->model('Home_model')->getAllDataVillages());
+    }
+
+    // GET MARKERS BY VILLAGE ID
     public function getAllMarkers() {
-        echo json_encode($this->model('Home_model')->getAllMarkers());
+        $village_id = $_POST['id'];
+        echo json_encode($this->model('Home_model')->getAllMarkersByVillage($village_id));
     }
 
+    // INPUT TABLE PEOPLE
+    public function firstTry() {
+        $start = microtime(true);
+        // echo $this->model('Home_model')->insertRandomCoordinate();
+        $this->model('Home_model')->insertRandomCoordinate();
+        // printf('%05d', rand(1, 65535));
+        $time_elapsed_secs = microtime(true) - $start;
+        echo 'Execution Time : ' . $time_elapsed_secs . ' seconds';
+    }
+
+    // INPUT COOR TO EACH TABLES
     public function getCoor() {
         $search = 'Indonesia';
         $get_data = $this->model('Home_model')->callApi('GET', 'https://api.mapbox.com/geocoding/v5/mapbox.places/' . $search . '.json?access_token=pk.eyJ1IjoicmFqYWZpa2hzYW4iLCJhIjoiY2tkbnh0cjZlMDJ4djJ5bzJuazM5YWs0MSJ9.s6_zk3KF7oTtuga9eXtLDQ', false);
