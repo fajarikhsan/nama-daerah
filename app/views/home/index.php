@@ -49,8 +49,8 @@
                     <th>Id Kota / Kabupaten</th>
                     <th>Id Kecamatan</th>
                     <th>Id Desa</th>
-                    <th>Latitude</th>
-                    <th>Longitude</th>
+                    <th>Lat</th>
+                    <th>Lng</th>
                     <th>Created Date</th>
                 </tr>
             </thead>

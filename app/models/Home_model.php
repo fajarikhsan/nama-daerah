@@ -2,7 +2,7 @@
 
 Class Home_model {
     private $db;
-    private $order_column = array("id", "case_number", "case_order", "province_id", "regency_id", "district_id", "village_id", null, null, null);
+    private $order_column = array("id", null, "case_order", "province_id", "regency_id", "district_id", "village_id", null, null, null);
 
     public function __construct()
     {
@@ -104,28 +104,19 @@ Class Home_model {
       $query = "SELECT *
       FROM people
       WHERE $record = '$id'";
-      $this->db->query($query);
-      $this->db->execute();
-      return $this->db->resultSet();
-   }
 
-   public function getAllPeople () {
-      $query = "SELECT *
-      FROM people";
-      if ( isset($_POST["search"]["value"]) ) {
-         $indikator = $_POST["search"]["value"];
-         $query .= " WHERE case_number LIKE '%" . $indikator . "%' OR case_order LIKE '%" . $indikator . "%'";
+      if ( isset($_POST['search']['value']) ) {
+         $query .= " AND case_number like \"%" . $_POST["search"]["value"] . "%\"";
       }
 
-      if ( isset($_POST["order"]) ) {
-         $order = $_POST["order"];
-         $query .= " ORDER BY " . $this->order_column[$order['0']['column']] . " " . $order['0']['dir'];
+      if ( isset($_POST['order']) ) {
+         $query .= " ORDER BY " . $this->order_column[$_POST['order']['0']['column']] . " " . $_POST['order']['0']['dir'];
       } else {
-         $query .= " ORDER BY id ASC";
+         $query .= " ORDER BY id DESC";
       }
 
-      if ( $_POST["length"] != -1 ) {
-         $query .= " LIMIT " . $_POST['length'] . ", " . $_POST['start'];
+      if ( $_POST['length'] != -1 ) {
+         $query .= " LIMIT " . $_POST["length"] . " OFFSET " . $_POST["start"];
       }
 
       $this->db->query($query);
@@ -133,19 +124,19 @@ Class Home_model {
       return $this->db->resultSet();
    }
 
-   public function get_filtered_data() {
+   public function getPeopleFilteredData ( $id, $record ) {
       $query = "SELECT *
-      FROM people";
-      if ( isset($_POST["search"]["value"]) ) {
-         $indikator = $_POST["search"]["value"];
-         $query .= " WHERE case_number LIKE '%" . $indikator . "%' OR case_order LIKE '%" . $indikator . "%'";
+      FROM people
+      WHERE $record = '$id'";
+
+      if ( isset($_POST['search']['value']) ) {
+         $query .= " AND case_number like \"%" . $_POST["search"]["value"] . "%\"";
       }
 
-      if ( isset($_POST["order"]) ) {
-         $order = $_POST["order"];
-         $query .= " ORDER BY " . $this->order_column[$order['0']['column']] . " " . $order['0']['dir'];
+      if ( isset($_POST['order']) ) {
+         $query .= " ORDER BY " . $this->order_column[$_POST['order']['0']['column']] . " " . $_POST['order']['0']['dir'];
       } else {
-         $query .= " ORDER BY id ASC";
+         $query .= " ORDER BY id DESC";
       }
 
       $this->db->query($query);
@@ -153,9 +144,62 @@ Class Home_model {
       return $this->db->rowCount();
    }
 
-   public function get_all_data() {
-      $query = "SELECT COUNT(id) AS 'id'
+   public function getPeopleCountAllData ( $id, $record ) {
+      $query = "SELECT *
+      FROM people
+      WHERE $record = '$id'";
+
+      $this->db->query($query);
+      $this->db->execute();
+      return $this->db->rowCount();
+   }
+
+   public function getAllPeople () {
+      $query = "SELECT *
       FROM people";
+
+      if ( isset($_POST['search']['value']) ) {
+         $query .= " WHERE case_number like \"%" . $_POST["search"]["value"] . "%\"";
+      }
+
+      if ( isset($_POST['order']) ) {
+         $query .= " ORDER BY " . $this->order_column[$_POST['order']['0']['column']] . " " . $_POST['order']['0']['dir'];
+      } else {
+         $query .= " ORDER BY id DESC";
+      }
+
+      if ( $_POST['length'] != -1 ) {
+         $query .= " LIMIT " . $_POST["length"] . " OFFSET " . $_POST["start"];
+      }
+
+      $this->db->query($query);
+      $this->db->execute();
+      return $this->db->resultSet();
+   }
+
+   public function getAllPeopleFilteredData () {
+      $query = "SELECT COUNT(id) AS id
+      FROM people";
+
+      if ( isset($_POST['search']['value']) ) {
+         $query .= " WHERE case_number like \"%" . $_POST["search"]["value"] . "%\"";
+      }
+
+      if ( isset($_POST['order']) ) {
+         $query .= " ORDER BY " . $this->order_column[$_POST['order']['0']['column']] . " " . $_POST['order']['0']['dir'];
+      } else {
+         $query .= " ORDER BY id DESC";
+      }
+
+      $this->db->query($query);
+      $this->db->execute();
+      return $this->db->single();
+   }
+
+   public function getAllPeopleCountAllData () {
+      $query = "SELECT COUNT(id) AS id
+      FROM people";
+
       $this->db->query($query);
       $this->db->execute();
       return $this->db->single();

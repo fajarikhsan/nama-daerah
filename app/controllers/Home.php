@@ -69,9 +69,9 @@ Class Home extends Controller {
         }
 
         $output = [
-            "draw" => intval($_POST['draw']),
-            "recordsTotal" => $this->model("Home_model")->get_all_data(),
-            "recordsFiltered" => $this->model("Home_model")->get_filtered_data()['id'],
+            "draw" => intval($_POST["draw"]),
+            "recordsTotal" => $this->model("Home_model")->getAllPeopleCountAllData()['id'],
+            "recordsFiltered" => $this->model("Home_model")->getAllPeopleFilteredData()['id'],
             "data" => $data
         ];
 
@@ -79,9 +79,33 @@ Class Home extends Controller {
     }
 
     public function getDatatablesData() {
-        // $record = $_POST['record'];
-        // $id = $_POST['id'];
-        echo json_encode($this->model('Home_model')->getAllDataVillages());
+        $record = $_POST['record'];
+        $id = $_POST['id'];
+        $fetch_data = $this->model("Home_model")->getPeopleById($id, $record);
+        $data = [];
+        foreach ( $fetch_data as $row ) {
+            $sub_array = [];
+            $sub_array[] = $row['id'];
+            $sub_array[] = $row['case_number'];
+            $sub_array[] = $row['case_order'];
+            $sub_array[] = $row['province_id'];
+            $sub_array[] = $row['regency_id'];
+            $sub_array[] = $row['district_id'];
+            $sub_array[] = $row['village_id'];
+            $sub_array[] = $row['lat'];
+            $sub_array[] = $row['lng'];
+            $sub_array[] = $row['created_at'];
+            $data[] = $sub_array;
+        }
+
+        $output = [
+            "draw" => intval($_POST["draw"]),
+            "recordsTotal" => $this->model("Home_model")->getPeopleCountAllData( $id, $record ),
+            "recordsFiltered" => $this->model("Home_model")->getPeopleFilteredData( $id, $record ),
+            "data" => $data
+        ];
+
+        echo json_encode($output);
     }
 
     // GET MARKERS BY VILLAGE ID
