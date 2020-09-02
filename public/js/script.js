@@ -4,8 +4,6 @@ $(document).ready(function() {
     var long = 116.348;
     var url = 'http://localhost/testmap/public/';
     var marker = [];
-    
-    // var mymap = L.map('mapid').setView([lat, long], 5);
 
     var baseLayer = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -52,6 +50,114 @@ $(document).ready(function() {
         heatmapLayer.setData(testData);
     });
 
+    // GRAPH
+    var dataPoints = [];
+    var options = {
+        animationEnabled: true,
+        theme: "light2",
+        zoomEnabled: true,
+        title: {
+            text: "Indonesia"
+        },
+        axisY: {
+            title: "Banyak Orang",
+            titleFontSize: 24,
+        },
+        data: [{
+            type: "line",
+            dataPoints: dataPoints
+        }]
+    };
+
+    // FUNCTIONS
+    // FUNCTION AJAX FOR GRAPH
+    function changeGraph( id, record, start, end, name ) {
+        $.ajax({
+            url: url + 'home/getGraphData',
+            data: {
+                id: id,
+                record: record,
+                start: start,
+                end: end
+            },
+            method: 'post',
+            dataType: 'json',
+            success: function (data) {
+                if ( !$.trim(data) ) {}
+                // var chart = new CanvasJS.Chart("chartContainer", options);
+                options.data[0].dataPoints = [];
+                options.title.text = name;
+
+                $.each(data, function(i, val) {
+                    var date = val.date_created;
+                    var year = parseInt(date.substr(0, 4));
+                    var month = parseInt(date.substr(5, 2)) - 1;
+                    var day = parseInt(date.substr(8, 2));
+                    options.data[0].dataPoints.push({
+                        x: new Date(year, month, day),
+                        y: parseInt(val.total)
+                    });
+                });
+
+                (new CanvasJS.Chart("chartContainer", options).render());
+                
+                // chart.render();
+            }
+        });
+    }
+
+    // Graph First Initialize
+    changeGraph ( null, null, null, null, 'Indonesia');
+
+    // Rangepicker
+    var startDate;
+    var endDate;
+    $('input[name="dates"]').daterangepicker({
+       showDropdowns: true,
+       opens: 'left',
+       autoUpdateInput: false,
+       locale: {
+           cancelLabel: 'Clear'
+       }
+    }, function(start, end, label) {
+       console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+      });
+
+    $('input[name="dates"]').on('apply.daterangepicker', function(ev, picker) {
+        $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+        startDate = picker.startDate.format('YYYY-MM-DD');
+        endDate = picker.endDate.format('YYYY-MM-DD');
+        if ( $('#villages').val() == 'pilih-desa' ) {
+            if ( $('#districts').val() == 'pilih-kecamatan' ) {
+                if ( $('#regencies').val() == 'pilih-kokab' ) {
+                    if ( $('#provinces').val() == 'pilih-provinsi' ) {
+                        var id = null;
+                        var record = null;
+                        var name = 'Indonesia';
+                    } else {
+                        var id = $('#provinces').val();
+                        var record = 'province_id';
+                    }
+                } else {
+                    var id = $('#regencies').val();
+                    var record = 'regency_id';
+                }
+            } else {
+                var id = $('#districts').val();
+                var record = 'district_id';
+            }
+        } else {
+            var id = $('#villages').val();
+            var record = 'village_id';
+        }
+
+        changeGraph( id, record, startDate, endDate, name );
+       
+    });
+  
+    $('input[name="dates"]').on('cancel.daterangepicker', function(ev, picker) {
+    });
+
     
     // GANTI PROVINSI
     $('#provinces').on('change', function() {
@@ -72,9 +178,22 @@ $(document).ready(function() {
                 mymap.removeLayer(marker[i]);
             });
         }
+
+        // check date
+        var checkDate = $('input[name="dates"]').val();
+        if ( checkDate == '' || checkDate == null ) {
+            var start = null;
+            var end = null;
+        } else {
+            var start = checkDate.substr(0, 10);
+            var end = checkDate.substr(13, 10);
+        }
     
         var id = $('#provinces').val();
+        var record = 'province_id';
         if ( id == 'pilih-provinsi') {
+            id = null;
+            record = null;
             // disable select regency
             $('#regencies').prop('disabled', true);
             // disable select district
@@ -82,6 +201,9 @@ $(document).ready(function() {
             // disable select village
             $('#villages').prop('disabled', true);
             mymap.setView([lat, long], 5);
+
+            // Change Graph
+            changeGraph( id, record, start, end, 'Indonesia');
         } else {
             $.ajax({
                 url: url + 'home/getProvince',
@@ -90,6 +212,7 @@ $(document).ready(function() {
                 dataType: 'json',
                 success: function(data) {
                     mymap.setView([data.lat, data.lng], 9);
+                    changeGraph( id, record, start, end, data.name );
                 }
             });
 
@@ -124,8 +247,19 @@ $(document).ready(function() {
                 mymap.removeLayer(marker[i]);
             });
         }
+
+        // check date
+        var checkDate = $('input[name="dates"]').val();
+        if ( checkDate == '' || checkDate == null ) {
+            var start = null;
+            var end = null;
+        } else {
+            var start = checkDate.substr(0, 10);
+            var end = checkDate.substr(13, 10);
+        }
         
         var id = $('#regencies').val();
+        var record = 'regency_id';
         if ( id == 'pilih-kokab' ) {
             // disable select district
             $('#districts').prop('disabled', true);
@@ -139,6 +273,8 @@ $(document).ready(function() {
                 dataType: 'json',
                 success: function(data) {
                     mymap.setView([data.lat, data.lng], 11);
+                    // Change Graph
+                    changeGraph( id, record, start, end, data.name );
                 }
             });
         
@@ -171,12 +307,23 @@ $(document).ready(function() {
     $('#districts').on('change', function () {
         $('option', '#villages').not(':eq(0)').remove();
         var id = $('#districts').val();
+        var record = 'district_id';
     
         // REMOVE OLD MARKERS
         if ( marker != undefined ) {
             $.each(marker, function (i) {
                 mymap.removeLayer(marker[i]);
             });
+        }
+
+        // check date
+        var checkDate = $('input[name="dates"]').val();
+        if ( checkDate == '' || checkDate == null ) {
+            var start = null;
+            var end = null;
+        } else {
+            var start = checkDate.substr(0, 10);
+            var end = checkDate.substr(13, 10);
         }
     
         if ( id == 'pilih-kecamatan' ) {
@@ -190,6 +337,8 @@ $(document).ready(function() {
                 dataType: 'json',
                 success: function(data) {
                     mymap.setView([data.lat, data.lng], 13);
+                    // Change Graph
+                    changeGraph (id, record, start, end, data.name);
                 }
             });
         
@@ -210,11 +359,22 @@ $(document).ready(function() {
     
     $('#villages').on('change', function () {
         var id = $('#villages').val();
+        var record = 'village_id';
         // REMOVE OLD MARKERS
         if ( marker != undefined ) {
             $.each(marker, function (i) {
                 mymap.removeLayer(marker[i]);
             });
+        }
+
+        // check date
+        var checkDate = $('input[name="dates"]').val();
+        if ( checkDate == '' || checkDate == null ) {
+            var start = null;
+            var end = null;
+        } else {
+            var start = checkDate.substr(0, 10);
+            var end = checkDate.substr(13, 10);
         }
     
         // SET MARKERS
@@ -237,6 +397,8 @@ $(document).ready(function() {
             dataType: 'json',
             success: function(data) {
                 mymap.setView([data.lat, data.lng], 14);
+                // Change Graph
+                changeGraph (id, record, start, end, data.name);
             }
         });
     });

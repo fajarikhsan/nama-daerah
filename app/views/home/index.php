@@ -13,6 +13,9 @@
    <!-- Datatables CSS -->
    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
 
+    <!-- daterangepicker CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
    <link rel="stylesheet" href="<?php echo BASEURL; ?>/css/style.css">
 
 </head>
@@ -36,8 +39,11 @@
     <select id="villages" name="villages" disabled>
         <option value="pilih-desa">Pilih Desa ...</option>
     </select>
-
     <div id="mapid"></div>
+
+    <input type="text" name="dates" class="form-control" autocomplete="off" value="<?php echo date('Y-m-d') . " - " . date('Y-m-d', strtotime(date('Y-m-d') . ' - 10 day')); ?>">
+    
+    <div id="chartContainer" style="height: 370px; width: 100%;"></div>
 
     <table id="information" class="display" style="width:100%">
             <thead>
@@ -62,8 +68,13 @@
     <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
    integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
    crossorigin=""></script>
+   <!-- CANVAS JS -->
+   <script src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>
    <!-- Datatables JS -->
    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
+   <!-- rangepicker JS -->
+   <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 
    <script src="<?php echo BASEURL; ?>/js/heatmap.js"></script>
    <script src="<?php echo BASEURL; ?>/js/leaflet-heatmap.js"></script>

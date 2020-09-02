@@ -205,6 +205,42 @@ Class Home_model {
       return $this->db->single();
    }
 
+   // GET DATE NOW
+   public function getDate() {
+      return date('Y-m-d');
+   }
+
+   // GET ALL GRAPH DATA
+   public function getAllGraphData( $start = null, $end = null ) {
+      if ( ($start == null && $end == null) || ($start == "" && $end == "") ) {
+         $end = $this->getDate();
+         $start = date('Y-m-d', strtotime($end . ' - 10 day'));
+      }
+      $query = "SELECT CAST(created_at AS DATE) AS date_created, COUNT(id) AS total
+      FROM people
+      GROUP BY date_created
+      HAVING date_created BETWEEN '$start' AND '$end'";
+      $this->db->query($query);
+      $this->db->execute();
+      return $this->db->resultSet();
+   }
+
+   // GET GRAPH DATA BY ID
+   public function getGraphDataById( $id, $record, $start = null, $end = null ) {
+      if ( ($start == null && $end == null) || ($start == "" && $end == "") ) {
+         $end = $this->getDate();
+         $start = date('Y-m-d', strtotime($end . ' - 10 day'));
+      }
+      $query = "SELECT CAST(created_at AS DATE) AS date_created, COUNT(id) AS total, province_id,
+      regency_id, district_id, village_id
+      FROM people
+      GROUP BY date_created
+      HAVING date_created BETWEEN '$start' AND '$end' AND $record = '$id'";
+      $this->db->query($query);
+      $this->db->execute();
+      return $this->db->resultSet();
+   }
+
    public function getAllDataVillages() {
       $query = "SELECT *
       FROM villages";

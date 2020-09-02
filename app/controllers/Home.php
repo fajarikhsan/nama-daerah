@@ -108,6 +108,29 @@ Class Home extends Controller {
         echo json_encode($output);
     }
 
+    // GET GRAPH DATA
+    public function getGraphData() {
+        if ( $_POST['start'] != null && $_POST['end'] != null ) {
+            $start = $_POST['start'];
+            $end = $_POST['end'];
+        } else {
+            $start = null;
+            $end = null;
+        }
+
+        if ( isset($_POST['id']) && isset($_POST['record']) ) {
+            if ( ($_POST['id'] != null) && ($_POST['record'] != null) ) {
+                $id = $_POST['id'];
+                $record = $_POST['record'];
+                echo json_encode($this->model("Home_model")->getGraphDataById( $id, $record, $start, $end ));
+            } else {
+                echo json_encode($this->model("Home_model")->getAllGraphData( $start, $end ));
+            }
+        } else {
+            echo json_encode($this->model("Home_model")->getAllGraphData( $start, $end ));
+        }
+    }
+
     // GET MARKERS BY VILLAGE ID
     public function getAllMarkers() {
         $village_id = $_POST['id'];
