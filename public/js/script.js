@@ -1,3 +1,13 @@
+// $body = $(".modal");
+// $(document).ajaxStart(function() {
+//     $body.addClass("loading"); console.log('start');
+//     $('.modal').css('display', 'block');
+// });
+// $(document).ajaxStop(function() {
+//     $body.removeClass("loading"); console.log('stop');
+//     $('.modal').css('display', 'none');
+// });
+
 $(document).ready(function() {
 
     var lat = -2.352;
@@ -80,6 +90,11 @@ $(document).ready(function() {
                 start: start,
                 end: end
             },
+            beforeSend: function(){
+                // Show image container
+                $("#modal").show();
+                console.log('show');
+            },
             method: 'post',
             dataType: 'json',
             success: function (data) {
@@ -102,6 +117,11 @@ $(document).ready(function() {
                 (new CanvasJS.Chart("chartContainer", options).render());
                 
                 // chart.render();
+            },
+            complete:function(data){
+                // Hide image container
+                $("#modal").hide();
+                console.log('hide');
             }
         });
     }
@@ -137,18 +157,22 @@ $(document).ready(function() {
                     } else {
                         var id = $('#provinces').val();
                         var record = 'province_id';
+                        var name = options.title.text;
                     }
                 } else {
                     var id = $('#regencies').val();
                     var record = 'regency_id';
+                    var name = options.title.text;
                 }
             } else {
                 var id = $('#districts').val();
                 var record = 'district_id';
+                var name = options.title.text;
             }
         } else {
             var id = $('#villages').val();
             var record = 'village_id';
+            var name = options.title.text;
         }
 
         changeGraph( id, record, startDate, endDate, name );
