@@ -82,7 +82,7 @@ $(document).ready(function() {
             },
             beforeSend: function(){
                 // Show image container
-                $("#modal").show();
+                $("#modal").fadeIn();
             },
             method: 'post',
             dataType: 'json',
@@ -106,7 +106,7 @@ $(document).ready(function() {
             },
             complete:function(data){
                 // Hide image container
-                $("#modal").hide();
+                $("#modal").fadeOut();
             }
         });
     }
