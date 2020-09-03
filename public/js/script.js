@@ -1,13 +1,3 @@
-// $body = $(".modal");
-// $(document).ajaxStart(function() {
-//     $body.addClass("loading"); console.log('start');
-//     $('.modal').css('display', 'block');
-// });
-// $(document).ajaxStop(function() {
-//     $body.removeClass("loading"); console.log('stop');
-//     $('.modal').css('display', 'none');
-// });
-
 $(document).ready(function() {
 
     var lat = -2.352;
@@ -93,13 +83,11 @@ $(document).ready(function() {
             beforeSend: function(){
                 // Show image container
                 $("#modal").show();
-                console.log('show');
             },
             method: 'post',
             dataType: 'json',
             success: function (data) {
                 if ( !$.trim(data) ) {}
-                // var chart = new CanvasJS.Chart("chartContainer", options);
                 options.data[0].dataPoints = [];
                 options.title.text = name;
 
@@ -115,13 +103,10 @@ $(document).ready(function() {
                 });
 
                 (new CanvasJS.Chart("chartContainer", options).render());
-                
-                // chart.render();
             },
             complete:function(data){
                 // Hide image container
                 $("#modal").hide();
-                console.log('hide');
             }
         });
     }
