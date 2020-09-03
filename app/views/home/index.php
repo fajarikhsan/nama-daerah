@@ -41,7 +41,15 @@
     </select>
     <div id="mapid"></div>
 
-    Periode <input type="text" name="dates" class="form-control" autocomplete="off" value="<?php echo date('m/d/Y', strtotime(date('Y-m-d') . ' - 10 day')) . " - " . date('m/d/Y'); ?>">
+    <div>
+        <table>
+            <tr>
+                <td>Periode <input type="text" name="dates" id="inputCalendar" autocomplete="off" value="<?php echo date('m/d/Y', strtotime(date('Y-m-d') . ' - 10 day')) . " - " . date('m/d/Y'); ?>" readonly></td>
+                <td><img src="img/calendar.png" id="calendar"></td>
+            </tr>
+        </table>
+    </div>
+
     
     <div id="modal"></div>
     <div id="chartContainer" style="height: 370px; width: 100%;">

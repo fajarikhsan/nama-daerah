@@ -117,7 +117,7 @@ $(document).ready(function() {
     // Rangepicker
     var startDate;
     var endDate;
-    $('input[name="dates"]').daterangepicker({
+    $('#calendar').daterangepicker({
        showDropdowns: true,
        opens: 'left',
        autoUpdateInput: false,
@@ -128,8 +128,8 @@ $(document).ready(function() {
        console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
       });
 
-    $('input[name="dates"]').on('apply.daterangepicker', function(ev, picker) {
-        $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+    $('#calendar').on('apply.daterangepicker', function(ev, picker) {
+        $('#inputCalendar').val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
         startDate = picker.startDate.format('YYYY-MM-DD');
         endDate = picker.endDate.format('YYYY-MM-DD');
         if ( $('#villages').val() == 'pilih-desa' ) {
@@ -164,7 +164,7 @@ $(document).ready(function() {
        
     });
   
-    $('input[name="dates"]').on('cancel.daterangepicker', function(ev, picker) {
+    $('#calendar').on('cancel.daterangepicker', function(ev, picker) {
     });
 
     
