@@ -2,7 +2,7 @@
 
 Class Home_model {
     private $db;
-    private $order_column = array("id", null, "case_order", "province_id", "regency_id", "district_id", "village_id", null, null, null);
+    private $order_column = array(null, "suspek", "probable", "konfirmasi", "kontak_erat");
 
     public function __construct()
     {
@@ -100,19 +100,25 @@ Class Home_model {
       return $this->db->resultSet();
    }
 
-   public function getPeopleById ( $id, $record ) {
-      $query = "SELECT *
+   public function getPeopleById ( $id, $record, $table, $condition ) {
+      $query = "SELECT $table.`name`, suspek, probable, konfirmasi, kontak_erat
+      FROM 
+      ( SELECT $condition, $record, COUNT(IF(case_number LIKE '%suspek%', 1, NULL)) 'suspek',
+      COUNT(IF(case_number LIKE '%probable%', 1, NULL)) 'probable',
+      COUNT(IF(case_number LIKE '%konfirmasi%', 1, NULL)) 'konfirmasi',
+      COUNT(IF(case_number LIKE '%kontak_erat%', 1, NULL)) 'kontak_erat' 
       FROM people
-      WHERE $record = '$id'";
+      GROUP BY $record
+      HAVING $condition = '$id' ) people INNER JOIN $table ON people.`$record` = $table.`id`";
 
       if ( isset($_POST['search']['value']) ) {
-         $query .= " AND case_number like \"%" . $_POST["search"]["value"] . "%\"";
+         $query .= " WHERE $table.`name` like \"%" . $_POST["search"]["value"] . "%\"";
       }
 
       if ( isset($_POST['order']) ) {
-         $query .= " ORDER BY " . $this->order_column[$_POST['order']['0']['column']] . " " . $_POST['order']['0']['dir'];
+         $query .= " ORDER BY " . $record . " " . $_POST['order']['0']['dir'];
       } else {
-         $query .= " ORDER BY id DESC";
+         $query .= " ORDER BY $record DESC";
       }
 
       if ( $_POST['length'] != -1 ) {
@@ -124,71 +130,22 @@ Class Home_model {
       return $this->db->resultSet();
    }
 
-   public function getPeopleFilteredData ( $id, $record ) {
-      $query = "SELECT *
+   public function getPeopleFilteredData ( $id, $record, $table, $condition ) {
+      $query = "SELECT COUNT($table.`name`) AS id
+      FROM 
+      ( SELECT $condition, $record
       FROM people
-      WHERE $record = '$id'";
+      GROUP BY $record
+      HAVING $condition = '$id' ) people INNER JOIN $table ON people.`$record` = $table.`id`";
 
       if ( isset($_POST['search']['value']) ) {
-         $query .= " AND case_number like \"%" . $_POST["search"]["value"] . "%\"";
+         $query .= " WHERE $table.`name` like \"%" . $_POST["search"]["value"] . "%\"";
       }
 
       if ( isset($_POST['order']) ) {
-         $query .= " ORDER BY " . $this->order_column[$_POST['order']['0']['column']] . " " . $_POST['order']['0']['dir'];
+         $query .= " ORDER BY " . $record . " " . $_POST['order']['0']['dir'];
       } else {
-         $query .= " ORDER BY id DESC";
-      }
-
-      $this->db->query($query);
-      $this->db->execute();
-      return $this->db->rowCount();
-   }
-
-   public function getPeopleCountAllData ( $id, $record ) {
-      $query = "SELECT *
-      FROM people
-      WHERE $record = '$id'";
-
-      $this->db->query($query);
-      $this->db->execute();
-      return $this->db->rowCount();
-   }
-
-   public function getAllPeople () {
-      $query = "SELECT *
-      FROM people";
-
-      if ( isset($_POST['search']['value']) ) {
-         $query .= " WHERE case_number like \"%" . $_POST["search"]["value"] . "%\"";
-      }
-
-      if ( isset($_POST['order']) ) {
-         $query .= " ORDER BY " . $this->order_column[$_POST['order']['0']['column']] . " " . $_POST['order']['0']['dir'];
-      } else {
-         $query .= " ORDER BY id DESC";
-      }
-
-      if ( $_POST['length'] != -1 ) {
-         $query .= " LIMIT " . $_POST["length"] . " OFFSET " . $_POST["start"];
-      }
-
-      $this->db->query($query);
-      $this->db->execute();
-      return $this->db->resultSet();
-   }
-
-   public function getAllPeopleFilteredData () {
-      $query = "SELECT COUNT(id) AS id
-      FROM people";
-
-      if ( isset($_POST['search']['value']) ) {
-         $query .= " WHERE case_number like \"%" . $_POST["search"]["value"] . "%\"";
-      }
-
-      if ( isset($_POST['order']) ) {
-         $query .= " ORDER BY " . $this->order_column[$_POST['order']['0']['column']] . " " . $_POST['order']['0']['dir'];
-      } else {
-         $query .= " ORDER BY id DESC";
+         $query .= " ORDER BY $record DESC";
       }
 
       $this->db->query($query);
@@ -196,9 +153,76 @@ Class Home_model {
       return $this->db->single();
    }
 
-   public function getAllPeopleCountAllData () {
-      $query = "SELECT COUNT(id) AS id
-      FROM people";
+   public function getPeopleCountAllData ( $id, $record, $table, $condition ) {
+      $query = "SELECT COUNT($table.`name`) AS id
+      FROM 
+      ( SELECT $condition, $record
+      FROM people
+      GROUP BY $record
+      HAVING $condition = '$id' ) people INNER JOIN $table ON people.`$record` = $table.`id`";
+
+      $this->db->query($query);
+      $this->db->execute();
+      return $this->db->single();
+   }
+
+   public function getAllPeople ( $table, $record ) {
+      $query = "SELECT $table.`name`, suspek, probable, konfirmasi, kontak_erat
+      FROM 
+      ( SELECT $record, COUNT(IF(case_number LIKE '%suspek%', 1, NULL)) 'suspek',
+      COUNT(IF(case_number LIKE '%probable%', 1, NULL)) 'probable',
+      COUNT(IF(case_number LIKE '%konfirmasi%', 1, NULL)) 'konfirmasi',
+      COUNT(IF(case_number LIKE '%kontak_erat%', 1, NULL)) 'kontak_erat' 
+      FROM people
+      GROUP BY $record ) people INNER JOIN $table ON people.`$record` = $table.`id`";
+
+      if ( isset($_POST['search']['value']) ) {
+         $query .= " HAVING $table.`name` like \"%" . $_POST["search"]["value"] . "%\"";
+      }
+
+      if ( isset($_POST['order']) ) {
+         $query .= " ORDER BY " . $record . " " . $_POST['order']['0']['dir'];
+      } else {
+         $query .= " ORDER BY $record DESC";
+      }
+
+      if ( $_POST['length'] != -1 ) {
+         $query .= " LIMIT " . $_POST["length"] . " OFFSET " . $_POST["start"];
+      }
+
+      $this->db->query($query);
+      $this->db->execute();
+      return $this->db->resultSet();
+   }
+
+   public function getAllPeopleFilteredData ( $table, $record ) {
+      $query = "SELECT COUNT($table.`name`) AS id
+      FROM 
+      ( SELECT $record 
+      FROM people
+      GROUP BY $record ) people INNER JOIN $table ON people.`$record` = $table.`id`";
+
+      if ( isset($_POST['search']['value']) ) {
+         $query .= " WHERE $table.`name` like \"%" . $_POST["search"]["value"] . "%\"";
+      }
+
+      if ( isset($_POST['order']) ) {
+         $query .= " ORDER BY " . $record . " " . $_POST['order']['0']['dir'];
+      } else {
+         $query .= " ORDER BY $record DESC";
+      }
+
+      $this->db->query($query);
+      $this->db->execute();
+      return $this->db->single();
+   }
+
+   public function getAllPeopleCountAllData ( $record, $table ) {
+      $query = "SELECT COUNT($table.`name`) AS id
+      FROM 
+      ( SELECT $record 
+      FROM people
+      GROUP BY $record ) people INNER JOIN $table ON people.`$record` = $table.`id`";
 
       $this->db->query($query);
       $this->db->execute();
@@ -216,7 +240,11 @@ Class Home_model {
          $end = $this->getDate();
          $start = date('Y-m-d', strtotime($end . ' - 10 day'));
       }
-      $query = "SELECT CAST(created_at AS DATE) AS date_created, COUNT(id) AS total
+      $query = "SELECT CAST(created_at AS DATE) AS date_created, COUNT(id) AS total,
+      COUNT(IF(case_number LIKE '%suspek%', 1, NULL)) 'suspek',
+      COUNT(IF(case_number LIKE '%probable%', 1, NULL)) 'probable',
+      COUNT(IF(case_number LIKE '%konfirmasi%', 1, NULL)) 'konfirmasi',
+      COUNT(IF(case_number LIKE '%kontak_erat%', 1, NULL)) 'kontak_erat'
       FROM people
       GROUP BY date_created
       HAVING date_created BETWEEN '$start' AND '$end'";
@@ -232,13 +260,29 @@ Class Home_model {
          $start = date('Y-m-d', strtotime($end . ' - 10 day'));
       }
       $query = "SELECT CAST(created_at AS DATE) AS date_created, COUNT(id) AS total, province_id,
-      regency_id, district_id, village_id
+      regency_id, district_id, village_id,
+      COUNT(IF(case_number LIKE '%suspek%', 1, NULL)) 'suspek',
+      COUNT(IF(case_number LIKE '%probable%', 1, NULL)) 'probable',
+      COUNT(IF(case_number LIKE '%konfirmasi%', 1, NULL)) 'konfirmasi',
+      COUNT(IF(case_number LIKE '%kontak_erat%', 1, NULL)) 'kontak_erat'
       FROM people
       GROUP BY date_created
       HAVING date_created BETWEEN '$start' AND '$end' AND $record = '$id'";
       $this->db->query($query);
       $this->db->execute();
       return $this->db->resultSet();
+   }
+
+   // get graph data status
+   public function getGraphDataStatusByDate( $date_created, $case_number ) {
+      $query = "SELECT CAST(created_at AS DATE) AS date_created, COUNT(id) AS total, province_id,
+      regency_id, district_id, village_id, case_number
+      FROM people
+      WHERE created_at LIKE '%$date_created%' 
+      AND case_number LIKE '%$case_number%'";
+      $this->db->query($query);
+      $this->db->execute();
+      return $this->db->single();
    }
 
    public function getAllDataVillages() {

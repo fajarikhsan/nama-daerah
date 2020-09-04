@@ -20,57 +20,48 @@
 
 </head>
 <body>
-
-    <select id="provinces" name="provinces">
-        <option value="pilih-provinsi">Pilih Provinsi ...</option>
-        <?php foreach ( $data['provinces'] as $p ) : ?>
-        <option value="<?php echo $p['id'] ?>"><?php echo $p['name'] ?></option>
-        <?php endforeach; ?>
-    </select>
-
-    <select id="regencies" name="regencies" disabled>
-        <option value="pilih-kokab">Pilih Kota/Kabupaten ...</option>
-    </select>
-
-    <select id="districts" name="districts" disabled>
-        <option value="pilih-kecamatan">Pilih Kecamatan ...</option>
-    </select>
-
-    <select id="villages" name="villages" disabled>
-        <option value="pilih-desa">Pilih Desa ...</option>
-    </select>
-    <div id="mapid"></div>
-
-    <div>
-        <table>
-            <tr>
-                <td>Periode <input type="text" name="dates" id="inputCalendar" autocomplete="off" value="<?php echo date('m/d/Y', strtotime(date('Y-m-d') . ' - 10 day')) . " - " . date('m/d/Y'); ?>" readonly></td>
-                <td><img src="img/calendar.png" id="calendar"></td>
-            </tr>
-        </table>
-    </div>
-
+    <div class="container">
+        <select id="provinces" name="provinces">
+            <option value="pilih-provinsi">Pilih Provinsi ...</option>
+            <?php foreach ( $data['provinces'] as $p ) : ?>
+            <option value="<?php echo $p['id'] ?>"><?php echo $p['name'] ?></option>
+            <?php endforeach; ?>
+        </select>
     
-    <div id="modal"></div>
-    <div id="chartContainer" style="height: 370px; width: 100%;">
+        <select id="regencies" name="regencies" disabled>
+            <option value="pilih-kokab">Pilih Kota/Kabupaten ...</option>
+        </select>
+    
+        <select id="districts" name="districts" disabled>
+            <option value="pilih-kecamatan">Pilih Kecamatan ...</option>
+        </select>
+    
+        <select id="villages" name="villages" disabled>
+            <option value="pilih-desa">Pilih Desa ...</option>
+        </select>
+        <div id="mapid"></div>
+    
+        <div>
+            <table>
+                <tr>
+                    <td>Periode</td>
+                    <td><input type="text" name="dates" id="inputCalendar" autocomplete="off" value="<?php echo date('m/d/Y', strtotime(date('Y-m-d') . ' - 10 day')) . " - " . date('m/d/Y'); ?>" readonly></td>
+                    <td><img src="img/calendar.png" id="calendar"></td>
+                </tr>
+            </table>
+        </div>
+    
+        
+        <div id="modal"></div>
+        <div id="chartContainer" style="height: 370px; width: 100%;">
+        </div>
+    
+        <table id="information" class="display" style="width:100%">
+                
+        </table>
+    
     </div>
 
-    <table id="information" class="display" style="width:100%">
-            <thead>
-                <tr>
-                    <th>Id</th>
-                    <th>Case Number</th>
-                    <th>Case Order</th>
-                    <th>Id Provinsi</th>
-                    <th>Id Kota / Kabupaten</th>
-                    <th>Id Kecamatan</th>
-                    <th>Id Desa</th>
-                    <th>Lat</th>
-                    <th>Lng</th>
-                    <th>Created Date</th>
-                </tr>
-            </thead>
-    </table>
 
 
     <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>

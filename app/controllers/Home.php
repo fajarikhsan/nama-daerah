@@ -51,27 +51,24 @@ Class Home extends Controller {
     }
 
     public function getAllDatatablesData() {
-        $fetch_data = $this->model("Home_model")->getAllPeople();
+        $table = $_POST['table'];
+        $record = $_POST['record'];
+        $fetch_data = $this->model("Home_model")->getAllPeople( $table, $record );
         $data = [];
         foreach ( $fetch_data as $row ) {
             $sub_array = [];
-            $sub_array[] = $row['id'];
-            $sub_array[] = $row['case_number'];
-            $sub_array[] = $row['case_order'];
-            $sub_array[] = $row['province_id'];
-            $sub_array[] = $row['regency_id'];
-            $sub_array[] = $row['district_id'];
-            $sub_array[] = $row['village_id'];
-            $sub_array[] = $row['lat'];
-            $sub_array[] = $row['lng'];
-            $sub_array[] = $row['created_at'];
+            $sub_array[] = $row['name'];
+            $sub_array[] = $row['suspek'];
+            $sub_array[] = $row['probable'];
+            $sub_array[] = $row['konfirmasi'];
+            $sub_array[] = $row['kontak_erat'];
             $data[] = $sub_array;
         }
 
         $output = [
             "draw" => intval($_POST["draw"]),
-            "recordsTotal" => $this->model("Home_model")->getAllPeopleCountAllData()['id'],
-            "recordsFiltered" => $this->model("Home_model")->getAllPeopleFilteredData()['id'],
+            "recordsTotal" => $this->model("Home_model")->getAllPeopleCountAllData( $record, $table )['id'],
+            "recordsFiltered" => $this->model("Home_model")->getAllPeopleFilteredData( $table, $record )['id'],
             "data" => $data
         ];
 
@@ -79,29 +76,26 @@ Class Home extends Controller {
     }
 
     public function getDatatablesData() {
+        $table = $_POST['table'];
         $record = $_POST['record'];
         $id = $_POST['id'];
-        $fetch_data = $this->model("Home_model")->getPeopleById($id, $record);
+        $condition = $_POST['condition'];
+        $fetch_data = $this->model("Home_model")->getPeopleById ( $id, $record, $table, $condition );
         $data = [];
         foreach ( $fetch_data as $row ) {
             $sub_array = [];
-            $sub_array[] = $row['id'];
-            $sub_array[] = $row['case_number'];
-            $sub_array[] = $row['case_order'];
-            $sub_array[] = $row['province_id'];
-            $sub_array[] = $row['regency_id'];
-            $sub_array[] = $row['district_id'];
-            $sub_array[] = $row['village_id'];
-            $sub_array[] = $row['lat'];
-            $sub_array[] = $row['lng'];
-            $sub_array[] = $row['created_at'];
+            $sub_array[] = $row['name'];
+            $sub_array[] = $row['suspek'];
+            $sub_array[] = $row['probable'];
+            $sub_array[] = $row['konfirmasi'];
+            $sub_array[] = $row['kontak_erat'];
             $data[] = $sub_array;
         }
 
         $output = [
             "draw" => intval($_POST["draw"]),
-            "recordsTotal" => $this->model("Home_model")->getPeopleCountAllData( $id, $record ),
-            "recordsFiltered" => $this->model("Home_model")->getPeopleFilteredData( $id, $record ),
+            "recordsTotal" => $this->model("Home_model")->getPeopleCountAllData ( $id, $record, $table, $condition )['id'],
+            "recordsFiltered" => $this->model("Home_model")->getPeopleFilteredData ( $id, $record, $table, $condition )['id'],
             "data" => $data
         ];
 
@@ -129,6 +123,13 @@ Class Home extends Controller {
         } else {
             echo json_encode($this->model("Home_model")->getAllGraphData( $start, $end ));
         }
+    }
+
+    // get graph data status
+    public function getGraphDataStatus() {
+        $date_created = $_POST['date_created'];
+        $case_number = $_POST['case_number'];
+        echo json_encode($this->model('Home_model')->getGraphDataStatusByDate( $date_created, $case_number ));
     }
 
     // GET MARKERS BY VILLAGE ID

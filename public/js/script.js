@@ -8,6 +8,7 @@ $(document).ready(function() {
     var baseLayer = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
         maxZoom: 18,
+        minZoom: 5,
         id: 'mapbox/streets-v11',
         tileSize: 512,
         zoomOffset: -1,
@@ -51,7 +52,6 @@ $(document).ready(function() {
     });
 
     // GRAPH
-    var dataPoints = [];
     var options = {
         animationEnabled: true,
         theme: "light2",
@@ -59,20 +59,43 @@ $(document).ready(function() {
         title: {
             text: "Indonesia"
         },
-        axisY: {
-            title: "Banyak Orang",
-            titleFontSize: 24,
+        toolTip: {
+            shared: true
         },
-        data: [{
-            type: "line",
-            dataPoints: dataPoints
-        }]
+        data: [
+            {
+                type: "splineArea",
+                name: "Total",
+                xValueFormatString: "DD MMM, YYYY",
+                showInLegend: "true"
+            },
+            {
+                type: "splineArea",
+                name: "SUSPEK",
+                showInLegend: "true"
+            },
+            {
+                type: "splineArea",
+                name: "PROBABLE",
+                showInLegend: "true"
+            },
+            {
+                type: "splineArea",
+                name: "KONFIRMASI",
+                showInLegend: "true"
+            },
+            {
+                type: "splineArea",
+                name: "KONTAK ERAT",
+                showInLegend: "true"
+            }
+        ]
     };
 
     // FUNCTIONS
     // FUNCTION AJAX FOR GRAPH
     function changeGraph( id, record, start, end, name ) {
-        $.ajax({
+        var xhr = $.ajax({
             url: url + 'home/getGraphData',
             data: {
                 id: id,
@@ -89,6 +112,10 @@ $(document).ready(function() {
             success: function (data) {
                 if ( !$.trim(data) ) {}
                 options.data[0].dataPoints = [];
+                options.data[1].dataPoints = [];
+                options.data[2].dataPoints = [];
+                options.data[3].dataPoints = [];
+                options.data[4].dataPoints = [];
                 options.title.text = name;
 
                 $.each(data, function(i, val) {
@@ -100,6 +127,23 @@ $(document).ready(function() {
                         x: new Date(year, month, day),
                         y: parseInt(val.total)
                     });
+                    options.data[1].dataPoints.push({
+                        x: new Date(year, month, day),
+                        y: parseInt(val.suspek)
+                    });
+                    options.data[2].dataPoints.push({
+                        x: new Date(year, month, day),
+                        y: parseInt(val.probable)
+                    });
+                    options.data[3].dataPoints.push({
+                        x: new Date(year, month, day),
+                        y: parseInt(val.konfirmasi)
+                    });
+                    options.data[4].dataPoints.push({
+                        x: new Date(year, month, day),
+                        y: parseInt(val.kontak_erat)
+                    });
+                    
                 });
 
                 (new CanvasJS.Chart("chartContainer", options).render());
