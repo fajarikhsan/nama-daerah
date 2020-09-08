@@ -53,6 +53,7 @@
     
         
         <div id="modal"></div>
+        <div id="null"> <span> Data Kosong </span> </div>
         <div id="chartContainer" style="height: 370px; width: 100%;">
         </div>
     

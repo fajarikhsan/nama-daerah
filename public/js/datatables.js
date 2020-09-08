@@ -94,6 +94,6 @@ $(document).ready(function() {
     $('#villages').on('change', function() {
         var id = $('#villages').val();
 
-        tables( 'Desa', 'villages', 'village_id', 'village_id', id );
+        // tables( 'Desa', 'villages', 'village_id', 'village_id', id );
     });
 });

@@ -103,16 +103,16 @@ Class Home_model {
    public function getPeopleById ( $id, $record, $table, $condition ) {
       $query = "SELECT $table.`name`, suspek, probable, konfirmasi, kontak_erat
       FROM 
-      ( SELECT $condition, $record, COUNT(IF(case_number LIKE '%suspek%', 1, NULL)) 'suspek',
-      COUNT(IF(case_number LIKE '%probable%', 1, NULL)) 'probable',
-      COUNT(IF(case_number LIKE '%konfirmasi%', 1, NULL)) 'konfirmasi',
-      COUNT(IF(case_number LIKE '%kontak_erat%', 1, NULL)) 'kontak_erat' 
+      ( SELECT $condition, $record, COUNT(IF(case_number LIKE 'suspek%', 1, NULL)) 'suspek',
+      COUNT(IF(case_number LIKE 'probable%', 1, NULL)) 'probable',
+      COUNT(IF(case_number LIKE 'konfirmasi%', 1, NULL)) 'konfirmasi',
+      COUNT(IF(case_number LIKE 'kontak_erat%', 1, NULL)) 'kontak_erat' 
       FROM people
       GROUP BY $record
       HAVING $condition = '$id' ) people INNER JOIN $table ON people.`$record` = $table.`id`";
 
       if ( isset($_POST['search']['value']) ) {
-         $query .= " WHERE $table.`name` like \"%" . $_POST["search"]["value"] . "%\"";
+         $query .= " WHERE $table.`name` like \"" . $_POST["search"]["value"] . "%\"";
       }
 
       if ( isset($_POST['order']) ) {
@@ -139,7 +139,7 @@ Class Home_model {
       HAVING $condition = '$id' ) people INNER JOIN $table ON people.`$record` = $table.`id`";
 
       if ( isset($_POST['search']['value']) ) {
-         $query .= " WHERE $table.`name` like \"%" . $_POST["search"]["value"] . "%\"";
+         $query .= " WHERE $table.`name` like \"" . $_POST["search"]["value"] . "%\"";
       }
 
       if ( isset($_POST['order']) ) {
@@ -169,15 +169,15 @@ Class Home_model {
    public function getAllPeople ( $table, $record ) {
       $query = "SELECT $table.`name`, suspek, probable, konfirmasi, kontak_erat
       FROM 
-      ( SELECT $record, COUNT(IF(case_number LIKE '%suspek%', 1, NULL)) 'suspek',
-      COUNT(IF(case_number LIKE '%probable%', 1, NULL)) 'probable',
-      COUNT(IF(case_number LIKE '%konfirmasi%', 1, NULL)) 'konfirmasi',
-      COUNT(IF(case_number LIKE '%kontak_erat%', 1, NULL)) 'kontak_erat' 
+      ( SELECT $record, COUNT(IF(case_number LIKE 'suspek%', 1, NULL)) 'suspek',
+      COUNT(IF(case_number LIKE 'probable%', 1, NULL)) 'probable',
+      COUNT(IF(case_number LIKE 'konfirmasi%', 1, NULL)) 'konfirmasi',
+      COUNT(IF(case_number LIKE 'kontak_erat%', 1, NULL)) 'kontak_erat' 
       FROM people
       GROUP BY $record ) people INNER JOIN $table ON people.`$record` = $table.`id`";
 
       if ( isset($_POST['search']['value']) ) {
-         $query .= " HAVING $table.`name` like \"%" . $_POST["search"]["value"] . "%\"";
+         $query .= " HAVING $table.`name` like \"" . $_POST["search"]["value"] . "%\"";
       }
 
       if ( isset($_POST['order']) ) {
@@ -203,7 +203,7 @@ Class Home_model {
       GROUP BY $record ) people INNER JOIN $table ON people.`$record` = $table.`id`";
 
       if ( isset($_POST['search']['value']) ) {
-         $query .= " WHERE $table.`name` like \"%" . $_POST["search"]["value"] . "%\"";
+         $query .= " WHERE $table.`name` like \"" . $_POST["search"]["value"] . "%\"";
       }
 
       if ( isset($_POST['order']) ) {
@@ -241,10 +241,10 @@ Class Home_model {
          $start = date('Y-m-d', strtotime($end . ' - 10 day'));
       }
       $query = "SELECT CAST(created_at AS DATE) AS date_created, COUNT(id) AS total,
-      COUNT(IF(case_number LIKE '%suspek%', 1, NULL)) 'suspek',
-      COUNT(IF(case_number LIKE '%probable%', 1, NULL)) 'probable',
-      COUNT(IF(case_number LIKE '%konfirmasi%', 1, NULL)) 'konfirmasi',
-      COUNT(IF(case_number LIKE '%kontak_erat%', 1, NULL)) 'kontak_erat'
+      COUNT(IF(case_number LIKE 'suspek%', 1, NULL)) 'suspek',
+      COUNT(IF(case_number LIKE 'probable%', 1, NULL)) 'probable',
+      COUNT(IF(case_number LIKE 'konfirmasi%', 1, NULL)) 'konfirmasi',
+      COUNT(IF(case_number LIKE 'kontak_erat%', 1, NULL)) 'kontak_erat'
       FROM people
       GROUP BY date_created
       HAVING date_created BETWEEN '$start' AND '$end'";
@@ -259,14 +259,13 @@ Class Home_model {
          $end = $this->getDate();
          $start = date('Y-m-d', strtotime($end . ' - 10 day'));
       }
-      $query = "SELECT CAST(created_at AS DATE) AS date_created, COUNT(id) AS total, province_id,
-      regency_id, district_id, village_id,
-      COUNT(IF(case_number LIKE '%suspek%', 1, NULL)) 'suspek',
-      COUNT(IF(case_number LIKE '%probable%', 1, NULL)) 'probable',
-      COUNT(IF(case_number LIKE '%konfirmasi%', 1, NULL)) 'konfirmasi',
-      COUNT(IF(case_number LIKE '%kontak_erat%', 1, NULL)) 'kontak_erat'
+      $query = "SELECT CAST(created_at AS DATE) AS date_created, COUNT(id) AS total, $record,
+      COUNT(IF(case_number LIKE 'suspek%', 1, NULL)) 'suspek',
+      COUNT(IF(case_number LIKE 'probable%', 1, NULL)) 'probable',
+      COUNT(IF(case_number LIKE 'konfirmasi%', 1, NULL)) 'konfirmasi',
+      COUNT(IF(case_number LIKE 'kontak_erat%', 1, NULL)) 'kontak_erat'
       FROM people
-      GROUP BY date_created
+      GROUP BY date_created, $record
       HAVING date_created BETWEEN '$start' AND '$end' AND $record = '$id'";
       $this->db->query($query);
       $this->db->execute();
@@ -278,8 +277,8 @@ Class Home_model {
       $query = "SELECT CAST(created_at AS DATE) AS date_created, COUNT(id) AS total, province_id,
       regency_id, district_id, village_id, case_number
       FROM people
-      WHERE created_at LIKE '%$date_created%' 
-      AND case_number LIKE '%$case_number%'";
+      WHERE created_at LIKE '$date_created%' 
+      AND case_number LIKE '$case_number%'";
       $this->db->query($query);
       $this->db->execute();
       return $this->db->single();

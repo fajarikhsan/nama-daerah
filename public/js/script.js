@@ -105,12 +105,17 @@ $(document).ready(function() {
             },
             beforeSend: function(){
                 // Show image container
+                $('#null').fadeOut();
                 $("#modal").fadeIn();
             },
             method: 'post',
             dataType: 'json',
             success: function (data) {
-                if ( !$.trim(data) ) {}
+                if ( !$.trim(data) ) {
+                    $('#null').css('display', 'flex');
+                    $('#null').css('align-items', 'center');
+                    $('#null').css('justify-content', 'center');
+                }
                 options.data[0].dataPoints = [];
                 options.data[1].dataPoints = [];
                 options.data[2].dataPoints = [];
@@ -237,9 +242,12 @@ $(document).ready(function() {
         if ( checkDate == '' || checkDate == null ) {
             var start = null;
             var end = null;
-        } else {
+        } else if ( checkDate.indexOf("/") == -1 ) {
             var start = checkDate.substr(0, 10);
             var end = checkDate.substr(13, 10);
+        } else {
+            var start = checkDate.substr(6,4) + '-' + checkDate.substr(0,2) + '-' + checkDate.substr(3,2);
+            var end = checkDate.substr(19,4) + '-' + checkDate.substr(13,2) + '-' + checkDate.substr(16,2);
         }
     
         var id = $('#provinces').val();
@@ -306,9 +314,12 @@ $(document).ready(function() {
         if ( checkDate == '' || checkDate == null ) {
             var start = null;
             var end = null;
-        } else {
+        } else if ( checkDate.indexOf("/") == -1 ) {
             var start = checkDate.substr(0, 10);
             var end = checkDate.substr(13, 10);
+        } else {
+            var start = checkDate.substr(6,4) + '-' + checkDate.substr(0,2) + '-' + checkDate.substr(3,2);
+            var end = checkDate.substr(19,4) + '-' + checkDate.substr(13,2) + '-' + checkDate.substr(16,2);
         }
         
         var id = $('#regencies').val();
@@ -325,6 +336,7 @@ $(document).ready(function() {
                 method: 'post',
                 dataType: 'json',
                 success: function(data) {
+                    console.log(data);
                     mymap.setView([data.lat, data.lng], 11);
                     // Change Graph
                     changeGraph( id, record, start, end, data.name );
@@ -374,9 +386,12 @@ $(document).ready(function() {
         if ( checkDate == '' || checkDate == null ) {
             var start = null;
             var end = null;
-        } else {
+        } else if ( checkDate.indexOf("/") == -1 ) {
             var start = checkDate.substr(0, 10);
             var end = checkDate.substr(13, 10);
+        } else {
+            var start = checkDate.substr(6,4) + '-' + checkDate.substr(0,2) + '-' + checkDate.substr(3,2);
+            var end = checkDate.substr(19,4) + '-' + checkDate.substr(13,2) + '-' + checkDate.substr(16,2);
         }
     
         if ( id == 'pilih-kecamatan' ) {
@@ -425,9 +440,12 @@ $(document).ready(function() {
         if ( checkDate == '' || checkDate == null ) {
             var start = null;
             var end = null;
-        } else {
+        } else if ( checkDate.indexOf("/") == -1 ) {
             var start = checkDate.substr(0, 10);
             var end = checkDate.substr(13, 10);
+        } else {
+            var start = checkDate.substr(6,4) + '-' + checkDate.substr(0,2) + '-' + checkDate.substr(3,2);
+            var end = checkDate.substr(19,4) + '-' + checkDate.substr(13,2) + '-' + checkDate.substr(16,2);
         }
     
         // SET MARKERS
