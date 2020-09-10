@@ -124,29 +124,33 @@ $(document).ready(function() {
                 options.title.text = name;
 
                 $.each(data, function(i, val) {
-                    var date = val.date_created;
+                    if ( typeof val.SUSPEK == 'undefined' )  val.SUSPEK = '0';
+                    if ( typeof val.PROBABLE == 'undefined' )  val.PROBABLE = '0';
+                    if ( typeof val.KONFIRMASI == 'undefined' )  val.KONFIRMASI = '0';
+                    if ( typeof val.KONTAK_ERAT == 'undefined' )  val.KONTAK_ERAT = '0';
+                    var date = i;
                     var year = parseInt(date.substr(0, 4));
                     var month = parseInt(date.substr(5, 2)) - 1;
                     var day = parseInt(date.substr(8, 2));
                     options.data[0].dataPoints.push({
                         x: new Date(year, month, day),
-                        y: parseInt(val.total)
+                        y: parseInt(val.SUSPEK) + parseInt(val.PROBABLE) + parseInt(val.KONFIRMASI) + parseInt(val.KONTAK_ERAT)
                     });
                     options.data[1].dataPoints.push({
                         x: new Date(year, month, day),
-                        y: parseInt(val.suspek)
+                        y: parseInt(val.SUSPEK)
                     });
                     options.data[2].dataPoints.push({
                         x: new Date(year, month, day),
-                        y: parseInt(val.probable)
+                        y: parseInt(val.PROBABLE)
                     });
                     options.data[3].dataPoints.push({
                         x: new Date(year, month, day),
-                        y: parseInt(val.konfirmasi)
+                        y: parseInt(val.KONFIRMASI)
                     });
                     options.data[4].dataPoints.push({
                         x: new Date(year, month, day),
-                        y: parseInt(val.kontak_erat)
+                        y: parseInt(val.KONTAK_ERAT)
                     });
                     
                 });

@@ -157,24 +157,8 @@ Class Home extends Controller {
         }
 
         foreach ( $fetch_data as $row ) {
-            $all[$row['date_created']][$row['case_status']] = $row['total'];
-        }
-
-        foreach ( $all as $header => $row ) {
-            ( isset($row['SUSPEK']) ) ? : $row['SUSPEK'] = '0';
-            ( isset($row['PROBABLE']) ) ? : $row['PROBABLE'] = '0';
-            ( isset($row['KONFIRMASI']) ) ? : $row['KONFIRMASI'] = '0';
-            ( isset($row['KONTAK_ERAT']) ) ? : $row['KONTAK_ERAT'] = '0';
-            $sub_array = [];
-            $sub_array = [ 
-                'date_created' => $header,
-                'suspek' => $row['SUSPEK'],
-                'probable' => $row['PROBABLE'],
-                'konfirmasi' => $row['KONFIRMASI'],
-                'kontak_erat' => $row['KONTAK_ERAT'],
-                'total' => (int) $row['SUSPEK'] + (int) $row['PROBABLE'] + (int) $row['KONFIRMASI'] + (int) $row['KONTAK_ERAT']
-            ];
-            $data[] = $sub_array;
+            ( isset($row['case_status']) ) ? : $row['case_status'] = '0';
+            $data[$row['date_created']][$row['case_status']] = $row['total'];
         }
 
         echo json_encode($data);

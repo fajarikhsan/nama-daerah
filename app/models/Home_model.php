@@ -102,18 +102,18 @@ Class Home_model {
    public function getPeopleById ( $id, $record, $condition ) {
       $query = "SELECT $condition, $record, case_status, COUNT(case_status) total
       FROM people
-      GROUP BY $record, case_status
-      HAVING $condition = '$id'";
+      WHERE $condition = '$id'
+      GROUP BY $record, case_status";
 
       // if ( isset($_POST['search']['value']) ) {
       //    $query .= " AND case_status like \"" . $_POST["search"]["value"] . "%\"";
       // }
 
-      if ( isset($_POST['order']) ) {
-         $query .= " ORDER BY " . $record . " " . $_POST['order']['0']['dir'];
-      } else {
-         $query .= " ORDER BY $record DESC";
-      }
+      // if ( isset($_POST['order']) ) {
+      //    $query .= " ORDER BY " . $record . " " . $_POST['order']['0']['dir'];
+      // } else {
+      //    $query .= " ORDER BY $record DESC";
+      // }
 
       if ( $_POST['length'] != -1 ) {
          $start = (int) $_POST["start"];
@@ -133,18 +133,18 @@ Class Home_model {
    public function getPeopleFilteredData ( $id, $record, $condition ) {
       $query = "SELECT $condition, $record, case_status, COUNT(case_status) total
       FROM people
-      GROUP BY $record, case_status
-      HAVING $condition = '$id'";
+      WHERE $condition = '$id'
+      GROUP BY $record, case_status";
 
       // if ( isset($_POST['search']['value']) ) {
       //    $query .= " AND case_status like \"" . $_POST["search"]["value"] . "%\"";
       // }
 
-      if ( isset($_POST['order']) ) {
-         $query .= " ORDER BY " . $record . " " . $_POST['order']['0']['dir'];
-      } else {
-         $query .= " ORDER BY $record DESC";
-      }
+      // if ( isset($_POST['order']) ) {
+      //    $query .= " ORDER BY " . $record . " " . $_POST['order']['0']['dir'];
+      // } else {
+      //    $query .= " ORDER BY $record DESC";
+      // }
 
       $this->db->query($query);
       $this->db->execute();
@@ -154,8 +154,8 @@ Class Home_model {
    public function getPeopleCountAllData ( $id, $record, $condition ) {
       $query = "SELECT $condition, $record, case_status, COUNT(case_status) total
       FROM people
-      GROUP BY $record, case_status
-      HAVING $condition = '$id'";
+      WHERE $condition = '$id'
+      GROUP BY $record, case_status";
 
       $this->db->query($query);
       $this->db->execute();
@@ -179,11 +179,11 @@ Class Home_model {
       //    $query .= " HAVING case_status like \"" . $_POST["search"]["value"] . "%\"";
       // }
 
-      if ( isset($_POST['order']) ) {
-         $query .= " ORDER BY " . $record . " " . $_POST['order']['0']['dir'];
-      } else {
-         $query .= " ORDER BY $record DESC";
-      }
+      // if ( isset($_POST['order']) ) {
+      //    $query .= " ORDER BY " . $record . " " . $_POST['order']['0']['dir'];
+      // } else {
+      //    $query .= " ORDER BY $record DESC";
+      // }
 
       if ( $_POST['length'] != -1 ) {
          $start = (int) $_POST["start"];
@@ -209,11 +209,11 @@ Class Home_model {
       //    $query .= " HAVING case_status like \"" . $_POST["search"]["value"] . "%\"";
       // }
 
-      if ( isset($_POST['order']) ) {
-         $query .= " ORDER BY " . $record . " " . $_POST['order']['0']['dir'];
-      } else {
-         $query .= " ORDER BY $record DESC";
-      }
+      // if ( isset($_POST['order']) ) {
+      //    $query .= " ORDER BY " . $record . " " . $_POST['order']['0']['dir'];
+      // } else {
+      //    $query .= " ORDER BY $record DESC";
+      // }
 
       $this->db->query($query);
       $this->db->execute();
@@ -243,8 +243,8 @@ Class Home_model {
       }
       $query = "SELECT CAST(created_at AS DATE) AS date_created, case_status, COUNT(case_status) total
       FROM people
-      GROUP BY date_created, case_status
-      HAVING date_created BETWEEN '$start' AND '$end'";
+      WHERE CAST(created_at AS DATE) BETWEEN '$start' AND '$end'
+      GROUP BY date_created, case_status";
       $this->db->query($query);
       $this->db->execute();
       return $this->db->resultSet();
@@ -259,8 +259,8 @@ Class Home_model {
       $query = "SELECT CAST(created_at AS DATE) AS date_created, case_status, COUNT(case_status) total,
       $record
       FROM people
-      GROUP BY date_created, case_status, $record
-      HAVING date_created BETWEEN '$start' AND '$end' AND $record = '$id'";
+      WHERE CAST(created_at AS DATE) BETWEEN '$start' AND '$end' AND $record = '$id'
+      GROUP BY date_created, case_status, $record";
       $this->db->query($query);
       $this->db->execute();
       return $this->db->resultSet();
