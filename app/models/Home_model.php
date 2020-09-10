@@ -310,50 +310,51 @@ Class Home_model {
          $coordinate = $this->generate_random_point([$cur_location['lat'], $cur_location['lng']], 2);
 
          // SINGLE QUERY
-         $query = "INSERT INTO people (case_status, case_number, case_order, province_id, regency_id, district_id, village_id, lat, lng, created_at) VALUES (:case_status, :case_number, :case_order, :province_id, :regency_id, :district_id, :village_id, :lat, :lng, :created_at)";
-         $this->db->query($query);
-         $this->db->bind('case_status', $person_status);
-         $this->db->bind('case_number', $case_number);
-         $this->db->bind('case_order', $case_order);
-         $this->db->bind('province_id', $province);
-         $this->db->bind('regency_id', $regency);
-         $this->db->bind('district_id', $district);
-         $this->db->bind('village_id', $village);
-         $this->db->bind('lat', $coordinate['0']);
-         $this->db->bind('lng', $coordinate['1']);
-         $this->db->bind('created_at', $datetime);
-         $this->db->execute();
+         // $query = "INSERT INTO people (case_status, case_number, case_order, province_id, regency_id, district_id, village_id, lat, lng, created_at) VALUES (:case_status, :case_number, :case_order, :province_id, :regency_id, :district_id, :village_id, :lat, :lng, :created_at)";
+         // $this->db->query($query);
+         // $this->db->bind('case_status', $person_status);
+         // $this->db->bind('case_number', $case_number);
+         // $this->db->bind('case_order', $case_order);
+         // $this->db->bind('province_id', $province);
+         // $this->db->bind('regency_id', $regency);
+         // $this->db->bind('district_id', $district);
+         // $this->db->bind('village_id', $village);
+         // $this->db->bind('lat', $coordinate['0']);
+         // $this->db->bind('lng', $coordinate['1']);
+         // $this->db->bind('created_at', $datetime);
+         // $this->db->execute();
          
          
          // BATCH QUERY
-         // $data[$i] = [
-         //    'case_number' => $case_number,
-         //    'case_order' => $case_order,
-         //    'province_id' => $province,
-         //    'regency_id' => $regency,
-         //    'district_id' => $district,
-         //    'village_id' => $village,
-         //    'lat' => $coordinate['0'],
-         //    'lng' => $coordinate['1'],
-         //    'created_at' => $datetime
-         // ];
+         $data[$i] = [
+            'case_status' => $person_status,
+            'case_number' => $case_number,
+            'case_order' => $case_order,
+            'province_id' => $province,
+            'regency_id' => $regency,
+            'district_id' => $district,
+            'village_id' => $village,
+            'lat' => $coordinate['0'],
+            'lng' => $coordinate['1'],
+            'created_at' => $datetime
+         ];
 
-         // if ( $i % 1000 == 0 ) {
-         //    $query = "INSERT INTO people (case_number, case_order, province_id, regency_id, district_id, village_id, lat, lng, created_at) VALUES ";
-         //    //Insert Database
-         //    for ( $a = $i - 999; $a <= $i; $a++ ) {
-         //       $input = $data[$a];
-         //       if ( $a != $i ) {
-         //          $query .= "('{$input['case_number']}', {$input['case_order']}, {$input['province_id']}, {$input['regency_id']}, {$input['district_id']}, {$input['village_id']}, {$input['lat']}, {$input['lng']}, '{$input['created_at']}'),";
-         //       } else {
-         //          $query .= "('{$input['case_number']}', {$input['case_order']}, {$input['province_id']}, {$input['regency_id']}, {$input['district_id']}, {$input['village_id']}, {$input['lat']}, {$input['lng']}, '{$input['created_at']}')";
-         //       }
-         //    }
-         //    $this->db->query($query);
-         //    $this->db->execute();
-         //    // reset array
-         //    $data = [];
-         // }
+         if ( $i % 1000 == 0 ) {
+            $query = "INSERT INTO people (case_status, case_number, case_order, province_id, regency_id, district_id, village_id, lat, lng, created_at) VALUES ";
+            //Insert Database
+            for ( $a = $i - 999; $a <= $i; $a++ ) {
+               $input = $data[$a];
+               if ( $a != $i ) {
+                  $query .= "('{$input['case_status']}', '{$input['case_number']}', {$input['case_order']}, {$input['province_id']}, {$input['regency_id']}, {$input['district_id']}, {$input['village_id']}, {$input['lat']}, {$input['lng']}, '{$input['created_at']}'),";
+               } else {
+                  $query .= "('{$input['case_status']}', '{$input['case_number']}', {$input['case_order']}, {$input['province_id']}, {$input['regency_id']}, {$input['district_id']}, {$input['village_id']}, {$input['lat']}, {$input['lng']}, '{$input['created_at']}')";
+               }
+            }
+            $this->db->query($query);
+            $this->db->execute();
+            // reset array
+            $data = [];
+         }
       }
    }
 
