@@ -12,6 +12,8 @@ $(document).ready(function() {
         var xhr = $('#information').dataTable({
             "processing": true,
             "serverSide": true,
+            "bFilter": false,
+            "bLengthChange": false,
             "order": [[ 1, "asc" ]],
             "ajax": {
                 'type': 'POST',
@@ -47,6 +49,8 @@ $(document).ready(function() {
         "processing": true,
         "serverSide": true,
         "order": [[ 1, "asc" ]],
+        "bFilter": false,
+        "bLengthChange": false,
         "ajax": {
             'type': 'POST',
             'url': url + 'home/getAllDatatablesData',

@@ -51,24 +51,40 @@ Class Home extends Controller {
     }
 
     public function getAllDatatablesData() {
-        $table = $_POST['table'];
         $record = $_POST['record'];
-        $fetch_data = $this->model("Home_model")->getAllPeople( $table, $record );
-        $data = [];
+        $table = $_POST['table'];
+        $fetch_data = $this->model("Home_model")->getAllPeople( $record );
+        // Province Name Array
+        $province_data = $this->model('Home_model')->getTablesName($table);
+        foreach ( $province_data as $p ) {
+            $province[] = [
+                'id' => $p['id'],
+                'name' => $p['name']
+            ];
+        }
+        $names = array_column($province, 'name', 'id');
+
         foreach ( $fetch_data as $row ) {
+            $province_name = $names[$row[$record]];
+            $all[$province_name][$row['case_status']] = $row['total'];
+        }
+
+        $data = [];
+
+        foreach ( $all as $header => $row ) {
             $sub_array = [];
-            $sub_array[] = $row['name'];
-            $sub_array[] = $row['suspek'];
-            $sub_array[] = $row['probable'];
-            $sub_array[] = $row['konfirmasi'];
-            $sub_array[] = $row['kontak_erat'];
+            $sub_array[] = $header;
+            $sub_array[] = $row['SUSPEK'];
+            $sub_array[] = $row['PROBABLE'];
+            $sub_array[] = $row['KONFIRMASI'];
+            $sub_array[] = $row['KONTAK_ERAT'];
             $data[] = $sub_array;
         }
 
         $output = [
             "draw" => intval($_POST["draw"]),
-            "recordsTotal" => $this->model("Home_model")->getAllPeopleCountAllData( $record, $table )['id'],
-            "recordsFiltered" => $this->model("Home_model")->getAllPeopleFilteredData( $table, $record )['id'],
+            "recordsTotal" => $this->model("Home_model")->getAllPeopleCountAllData( $record ),
+            "recordsFiltered" => $this->model("Home_model")->getAllPeopleFilteredData( $record ),
             "data" => $data
         ];
 
@@ -76,26 +92,42 @@ Class Home extends Controller {
     }
 
     public function getDatatablesData() {
-        $table = $_POST['table'];
         $record = $_POST['record'];
         $id = $_POST['id'];
+        $table = $_POST['table'];
         $condition = $_POST['condition'];
-        $fetch_data = $this->model("Home_model")->getPeopleById ( $id, $record, $table, $condition );
-        $data = [];
+        $fetch_data = $this->model("Home_model")->getPeopleById ( $id, $record, $condition );
+        // Province Name Array
+        $each_data = $this->model('Home_model')->getTablesName($table);
+        foreach ( $each_data as $p ) {
+            $each[] = [
+                'id' => $p['id'],
+                'name' => $p['name']
+            ];
+        }
+        $names = array_column($each, 'name', 'id');
+
         foreach ( $fetch_data as $row ) {
+            $province_name = $names[$row[$record]];
+            $all[$province_name][$row['case_status']] = $row['total'];
+        }
+
+        $data = [];
+
+        foreach ( $all as $header => $row ) {
             $sub_array = [];
-            $sub_array[] = $row['name'];
-            $sub_array[] = $row['suspek'];
-            $sub_array[] = $row['probable'];
-            $sub_array[] = $row['konfirmasi'];
-            $sub_array[] = $row['kontak_erat'];
+            $sub_array[] = $header;
+            $sub_array[] = $row['SUSPEK'];
+            $sub_array[] = $row['PROBABLE'];
+            $sub_array[] = $row['KONFIRMASI'];
+            $sub_array[] = $row['KONTAK_ERAT'];
             $data[] = $sub_array;
         }
 
         $output = [
             "draw" => intval($_POST["draw"]),
-            "recordsTotal" => $this->model("Home_model")->getPeopleCountAllData ( $id, $record, $table, $condition )['id'],
-            "recordsFiltered" => $this->model("Home_model")->getPeopleFilteredData ( $id, $record, $table, $condition )['id'],
+            "recordsTotal" => $this->model("Home_model")->getPeopleCountAllData ( $id, $record, $condition ),
+            "recordsFiltered" => $this->model("Home_model")->getPeopleFilteredData ( $id, $record, $condition ),
             "data" => $data
         ];
 
@@ -104,6 +136,8 @@ Class Home extends Controller {
 
     // GET GRAPH DATA
     public function getGraphData() {
+        $data = [];
+
         if ( $_POST['start'] != null && $_POST['end'] != null ) {
             $start = $_POST['start'];
             $end = $_POST['end'];
@@ -116,20 +150,34 @@ Class Home extends Controller {
             if ( ($_POST['id'] != null) && ($_POST['record'] != null) ) {
                 $id = $_POST['id'];
                 $record = $_POST['record'];
-                echo json_encode($this->model("Home_model")->getGraphDataById( $id, $record, $start, $end ));
+                $fetch_data = $this->model("Home_model")->getGraphDataById( $id, $record, $start, $end );
             } else {
-                echo json_encode($this->model("Home_model")->getAllGraphData( $start, $end ));
+                $fetch_data = $this->model("Home_model")->getAllGraphData( $start, $end );
             }
-        } else {
-            echo json_encode($this->model("Home_model")->getAllGraphData( $start, $end ));
         }
-    }
 
-    // get graph data status
-    public function getGraphDataStatus() {
-        $date_created = $_POST['date_created'];
-        $case_number = $_POST['case_number'];
-        echo json_encode($this->model('Home_model')->getGraphDataStatusByDate( $date_created, $case_number ));
+        foreach ( $fetch_data as $row ) {
+            $all[$row['date_created']][$row['case_status']] = $row['total'];
+        }
+
+        foreach ( $all as $header => $row ) {
+            ( isset($row['SUSPEK']) ) ? : $row['SUSPEK'] = '0';
+            ( isset($row['PROBABLE']) ) ? : $row['PROBABLE'] = '0';
+            ( isset($row['KONFIRMASI']) ) ? : $row['KONFIRMASI'] = '0';
+            ( isset($row['KONTAK_ERAT']) ) ? : $row['KONTAK_ERAT'] = '0';
+            $sub_array = [];
+            $sub_array = [ 
+                'date_created' => $header,
+                'suspek' => $row['SUSPEK'],
+                'probable' => $row['PROBABLE'],
+                'konfirmasi' => $row['KONFIRMASI'],
+                'kontak_erat' => $row['KONTAK_ERAT'],
+                'total' => (int) $row['SUSPEK'] + (int) $row['PROBABLE'] + (int) $row['KONFIRMASI'] + (int) $row['KONTAK_ERAT']
+            ];
+            $data[] = $sub_array;
+        }
+
+        echo json_encode($data);
     }
 
     // GET MARKERS BY VILLAGE ID
