@@ -310,8 +310,9 @@ Class Home_model {
          $coordinate = $this->generate_random_point([$cur_location['lat'], $cur_location['lng']], 2);
 
          // SINGLE QUERY
-         $query = "INSERT INTO people (case_number, case_order, province_id, regency_id, district_id, village_id, lat, lng, created_at) VALUES (:case_number, :case_order, :province_id, :regency_id, :district_id, :village_id, :lat, :lng, :created_at)";
+         $query = "INSERT INTO people (case_status, case_number, case_order, province_id, regency_id, district_id, village_id, lat, lng, created_at) VALUES (:case_status, :case_number, :case_order, :province_id, :regency_id, :district_id, :village_id, :lat, :lng, :created_at)";
          $this->db->query($query);
+         $this->db->bind('case_status', $person_status);
          $this->db->bind('case_number', $case_number);
          $this->db->bind('case_order', $case_order);
          $this->db->bind('province_id', $province);
