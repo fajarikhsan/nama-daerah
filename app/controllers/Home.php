@@ -43,7 +43,8 @@ Class Home extends Controller {
 
     // GET HEATMAP DATA
     public function getHeatmapData() {
-        // echo json_encode($this->model('Home_model')->getAllHeatmap());
+        // $id = $_POST['id'];
+        // echo json_encode($this->model('Home_model')->getAllHeatmap( $id ));
         // var_dump($this->model('Home_model')->getAllHeatmap());
         $fp = fopen('heatmap-coordinate.json', 'w');
         fwrite($fp, json_encode($this->model('Home_model')->getAllHeatmap()));
@@ -115,6 +116,10 @@ Class Home extends Controller {
         $data = [];
 
         foreach ( $all as $header => $row ) {
+            ( isset($row['SUSPEK']) ) ? : $row['SUSPEK'] = '0';
+            ( isset($row['PROBABLE']) ) ? : $row['PROBABLE'] = '0';
+            ( isset($row['KONFIRMASI']) ) ? : $row['KONFIRMASI'] = '0';
+            ( isset($row['KONTAK_ERAT']) ) ? : $row['KONTAK_ERAT'] = '0';
             $sub_array = [];
             $sub_array[] = $header;
             $sub_array[] = $row['SUSPEK'];
@@ -132,6 +137,17 @@ Class Home extends Controller {
         ];
 
         echo json_encode($output);
+    }
+
+    // get villages aggregate
+    public function getVillagesAgg() {
+        $fetch_data = $this->model('Home_model')->getAllVIllagesAgg();
+        foreach ( $fetch_data as $row ) {
+            $data[$row['village_id']][$row['case_status']] = $row['total'];
+        }
+        $fp = fopen('villages_agg.json', 'w');
+        fwrite($fp, json_encode($data));
+        fclose($fp);
     }
 
     // GET GRAPH DATA

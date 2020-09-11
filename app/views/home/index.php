@@ -22,7 +22,7 @@
 <body>
     <div class="container">
         <select id="provinces" name="provinces">
-            <option value="pilih-provinsi">Pilih Provinsi ...</option>
+            <option value="pilih-provinsi">Semua</option>
             <?php foreach ( $data['provinces'] as $p ) : ?>
             <option value="<?php echo $p['id'] ?>"><?php echo $p['name'] ?></option>
             <?php endforeach; ?>
@@ -64,6 +64,10 @@
     </div>
 
 
+
+    <script type="text/javascript">
+        window.base_url = '<?php echo BASEURL; ?>';
+    </script>         
 
     <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
    <!-- Make sure you put this AFTER Leaflet's CSS -->

@@ -1,15 +1,17 @@
 $(document).ready(function() {
 
-    var url = 'http://localhost/testmap/public/';
+    var url = window.base_url;
+    var xhr;
 
     // FUNCTIONS
     // RE-INITIALIZE DATATABLES
     function tables( name, table, record, condition, id ) {
+        xhr.settings()[0].jqXHR.abort();
         // RE-INITIALIZE DATATABLES
         $('#information').DataTable().clear();
         $('#information').DataTable().destroy();
         // INITIALIZE DATATABLES
-        var xhr = $('#information').dataTable({
+        xhr = $('#information').DataTable({
             "processing": true,
             "serverSide": true,
             "bFilter": false,
@@ -17,7 +19,7 @@ $(document).ready(function() {
             "order": [[ 1, "asc" ]],
             "ajax": {
                 'type': 'POST',
-                'url': url + 'home/getDatatablesData',
+                'url': url + '/home/getDatatablesData',
                 'data': {
                     table: table, 
                     record: record,
@@ -45,7 +47,7 @@ $(document).ready(function() {
 
     // GLOBAL
     // INITIALIZE DATATABLES
-    var xhr = $('#information').DataTable({
+    xhr = $('#information').DataTable({
         "processing": true,
         "serverSide": true,
         "order": [[ 1, "asc" ]],
@@ -53,7 +55,7 @@ $(document).ready(function() {
         "bLengthChange": false,
         "ajax": {
             'type': 'POST',
-            'url': url + 'home/getAllDatatablesData',
+            'url': url + '/home/getAllDatatablesData',
             'data': {
                 table: 'provinces',
                 record: 'province_id'
@@ -79,19 +81,64 @@ $(document).ready(function() {
     // GANTI PROVINSI
     $('#provinces').on('change', function() {
         id = $('#provinces').val();
-        tables( 'Kota / Kabupaten', 'regencies', 'regency_id', 'province_id', id );
+        if ( id == 'pilih-provinsi') {
+            $('#information').DataTable().clear();
+            $('#information').DataTable().destroy();
+            // GLOBAL
+            // INITIALIZE DATATABLES
+            $('#information').DataTable({
+                "processing": true,
+                "serverSide": true,
+                "order": [[ 1, "asc" ]],
+                "bFilter": false,
+                "bLengthChange": false,
+                "ajax": {
+                    'type': 'POST',
+                    'url': url + '/home/getAllDatatablesData',
+                    'data': {
+                        table: 'provinces',
+                        record: 'province_id'
+                    }
+                },
+                "columnDefs": [
+                    {
+                        "targets": [0,1,2,3,4],
+                        "orderable": false
+                    },
+                    {
+                        "targets": [1,2,3,4],
+                        "className": 'dt-body-center'
+                    },
+                    {"title": "Provinsi", "targets": 0},
+                    {"title": "Suspek", "targets": 1},
+                    {"title": "Probable", "targets": 2},
+                    {"title": "Konfirmasi", "targets": 3},
+                    {"title": "Kontak Erat", "targets": 4}
+                ]
+            });
+        } else {
+            tables( 'Kota / Kabupaten', 'regencies', 'regency_id', 'province_id', id );
+        }
     });
 
     // GANTI KOTA / KABUPATEN
     $('#regencies').on('change', function() {
         id = $('#regencies').val();
-        tables( 'Kecamatan', 'districts', 'district_id', 'regency_id', id );
+        if ( id == 'pilih-kokab' ) {
+            tables( 'Kota / Kabupaten', 'regencies', 'regency_id', 'province_id', $('#provinces').val() );
+        } else {
+            tables( 'Kecamatan', 'districts', 'district_id', 'regency_id', id );
+        }
     });
 
     // GANTI KECAMATAN
     $('#districts').on('change', function() {
         id = $('#districts').val();
-        tables( 'Desa', 'villages', 'village_id', 'district_id', id );
+        if ( id == 'pilih-kecamatan' ) {
+            tables( 'Kecamatan', 'districts', 'district_id', 'regency_id', $('#regencies').val() );
+        } else {
+            tables( 'Desa', 'villages', 'village_id', 'district_id', id );
+        }
     });
 
     // GANTI DESA

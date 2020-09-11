@@ -90,10 +90,10 @@ Class Home_model {
 
    // GET HEATMAP DATA
    public function getAllHeatmap() {
-      $query = "SELECT regencies.`lat`, regencies.`lng`, COUNT(people.`id`) AS 'people_in_city'
+      $query = "SELECT people.`province_id`, regencies.`lat`, regencies.`lng`, COUNT(people.`id`) AS 'people_in_city'
       FROM people INNER JOIN regencies ON people.`regency_id` = regencies.`id`
       GROUP BY regency_id
-      having people_in_city > 0";
+      HAVING people_in_city > 0";
       $this->db->query($query);
       $this->db->execute();
       return $this->db->resultSet();
@@ -221,9 +221,9 @@ Class Home_model {
    }
 
    public function getAllPeopleCountAllData ( $record ) {
-      $query = "SELECT COUNT(province_id)
+      $query = "SELECT COUNT($record)
       FROM people
-      GROUP BY province_id";
+      GROUP BY $record";
 
       $this->db->query($query);
       $this->db->execute();
@@ -261,6 +261,15 @@ Class Home_model {
       FROM people
       WHERE CAST(created_at AS DATE) BETWEEN '$start' AND '$end' AND $record = '$id'
       GROUP BY date_created, case_status, $record";
+      $this->db->query($query);
+      $this->db->execute();
+      return $this->db->resultSet();
+   }
+
+   public function getAllVillagesAgg() {
+      $query = "SELECT village_id, case_status, COUNT(case_status) total
+      FROM people
+      GROUP BY village_id, case_status";
       $this->db->query($query);
       $this->db->execute();
       return $this->db->resultSet();
