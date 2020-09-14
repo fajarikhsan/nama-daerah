@@ -86,7 +86,7 @@ $(document).ready(function() {
             $('#information').DataTable().destroy();
             // GLOBAL
             // INITIALIZE DATATABLES
-            $('#information').DataTable({
+            xhr = $('#information').DataTable({
                 "processing": true,
                 "serverSide": true,
                 "order": [[ 1, "asc" ]],

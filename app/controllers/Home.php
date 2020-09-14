@@ -182,8 +182,9 @@ Class Home extends Controller {
 
     // GET MARKERS BY VILLAGE ID
     public function getAllMarkers() {
-        $village_id = $_POST['id'];
-        echo json_encode($this->model('Home_model')->getAllMarkersByVillage($village_id));
+        $id = $_POST['id'];
+        $record = $_POST['record'];
+        echo json_encode($this->model('Home_model')->getAllMarkersById( $id, $record ));
     }
 
     // INPUT TABLE PEOPLE

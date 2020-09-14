@@ -4,7 +4,8 @@ $(document).ready(function() {
     var long = 116.348;
     var url = window.base_url;
     var marker = [];
-    var oldRequest;
+    var markers = L.markerClusterGroup();
+    var oldRequest, markerRequest;
 
     var baseLayer = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -248,6 +249,11 @@ $(document).ready(function() {
             });
         }
 
+        // REMOVE OLD MARKERS
+        if ( mymap.hasLayer(markers) == true ) {
+            mymap.removeLayer(markers);
+        }
+
         // check date
         var checkDate = $('input[name="dates"]').val();
         if ( checkDate == '' || checkDate == null ) {
@@ -403,6 +409,11 @@ $(document).ready(function() {
             });
         }
 
+        // REMOVE OLD MARKERS
+        if ( mymap.hasLayer(markers) == true ) {
+            mymap.removeLayer(markers);
+        }
+
         // REMOVE HEATMAP LAYERS
         // Remove Old Heatmap Layer
         if ( mymap.hasLayer(heatmapLayer) == true ) {
@@ -441,6 +452,26 @@ $(document).ready(function() {
                 }
             });
         } else {
+            // SET MARKERS
+            markerRequest = $.ajax({
+                url: url + '/home/getAllMarkers',
+                data: {id: id, record: record},
+                method: 'post',
+                dataType: 'json',
+                beforeSend: function() {
+                    if( markerRequest != undefined ){ 
+                        markerRequest.abort();
+                    } 
+                },
+                success: function(data) {
+                    $.each(data, function (i, val) {
+                        markers.addLayer(L.marker(new L.LatLng(val.lat, val.lng), {title: val.case_number}));
+                        // marker[i] = L.marker([val.lat, val.lng]).addTo(mymap);
+                    });
+                    mymap.addLayer(markers);
+                }
+            });
+
             $.ajax({
                 url: url + '/home/getRegencyCoordinate',
                 data: {id: id},
@@ -481,6 +512,11 @@ $(document).ready(function() {
             });
         }
 
+        // REMOVE OLD MARKERS
+        if ( mymap.hasLayer(markers) == true ) {
+            mymap.removeLayer(markers);
+        }
+
         // REMOVE HEATMAP LAYERS
         // Remove Old Heatmap Layer
         if ( mymap.hasLayer(heatmapLayer) == true ) {
@@ -516,6 +552,26 @@ $(document).ready(function() {
                 }
             });
         } else {
+            // SET MARKERS
+            markerRequest = $.ajax({
+                url: url + '/home/getAllMarkers',
+                data: {id: id, record: 'district_id'},
+                method: 'post',
+                dataType: 'json',
+                beforeSend: function() {
+                    if( markerRequest != undefined ){ 
+                        markerRequest.abort();
+                    } 
+                },
+                success: function(data) {
+                    $.each(data, function (i, val) {
+                        markers.addLayer(L.marker(new L.LatLng(val.lat, val.lng), {title: val.case_number}));
+                        // marker[i] = L.marker([val.lat, val.lng]).addTo(mymap);
+                    });
+                    mymap.addLayer(markers);
+                }
+            });
+
             $.ajax({
                 url: url + '/home/getDistrictCoordinate',
                 data: {id: id},
@@ -553,6 +609,11 @@ $(document).ready(function() {
             });
         }
 
+        // REMOVE OLD MARKERS
+        if ( mymap.hasLayer(markers) == true ) {
+            mymap.removeLayer(markers);
+        }
+
         // REMOVE HEATMAP LAYERS
         // Remove Old Heatmap Layer
         if ( mymap.hasLayer(heatmapLayer) == true ) {
@@ -586,14 +647,20 @@ $(document).ready(function() {
             });
         } else {
             // SET MARKERS
-            $.ajax({
+            markerRequest = $.ajax({
                 url: url + '/home/getAllMarkers',
-                data: {id: id},
+                data: {id: id, record: 'village_id'},
                 method: 'post',
                 dataType: 'json',
+                beforeSend: function() {
+                    if( markerRequest != undefined ){ 
+                        markerRequest.abort();
+                    } 
+                },
                 success: function(data) {
                     $.each(data, function (i, val) {
-                        marker[i] = L.marker([val.lat, val.lng]).addTo(mymap);
+                        marker[i] = L.marker([val.lat, val.lng], {title: val.case_number}).addTo(mymap);
+                        // marker[i].bindPopup(val.case_number).openPopup();
                     });
                 }
             });

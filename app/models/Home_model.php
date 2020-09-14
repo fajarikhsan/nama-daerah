@@ -79,10 +79,10 @@ Class Home_model {
    }
 
    // GET MARKERS BY VILLAGE ID
-   public function getAllMarkersByVillage( $id ) {
-      $query = "SELECT *
+   public function getAllMarkersById( $id, $record ) {
+      $query = "SELECT case_number, lat, lng
       FROM people
-      WHERE village_id = '$id'";
+      WHERE $record = '$id'";
       $this->db->query($query);
       $this->db->execute();
       return $this->db->resultSet();

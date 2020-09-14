@@ -10,7 +10,7 @@
 
 .container {
     width: 95%;
-    margin: 80px auto;
+    margin: 10px auto;
     background-color: white;
     position: relative;
 }
@@ -55,4 +55,9 @@
 
 #inputCalendar {
     box-sizing: border-box;
+}
+
+.table {
+    height: 500px;
+    margin-bottom: 20px;
 }
