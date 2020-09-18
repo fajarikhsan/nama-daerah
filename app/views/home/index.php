@@ -18,28 +18,32 @@
     <!-- daterangepicker CSS -->
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 
+    <!-- DevExtreme themes -->
+    <link rel="stylesheet" href="https://cdn3.devexpress.com/jslib/20.1.7/css/dx.common.css">
+    <link rel="stylesheet" href="https://cdn3.devexpress.com/jslib/20.1.7/css/dx.light.css">
+
    <link rel="stylesheet" href="<?php echo BASEURL; ?>/css/style.css">
 
 </head>
 <body>
     <div class="container">
         <select id="provinces" name="provinces">
-            <option value="pilih-provinsi">Semua</option>
+            <option value="0">Semua</option>
             <?php foreach ( $data['provinces'] as $p ) : ?>
             <option value="<?php echo $p['id'] ?>"><?php echo $p['name'] ?></option>
             <?php endforeach; ?>
         </select>
     
         <select id="regencies" name="regencies" disabled>
-            <option value="pilih-kokab">Pilih Kota/Kabupaten ...</option>
+            <option value="0">Pilih Kota/Kabupaten ...</option>
         </select>
     
         <select id="districts" name="districts" disabled>
-            <option value="pilih-kecamatan">Pilih Kecamatan ...</option>
+            <option value="0">Pilih Kecamatan ...</option>
         </select>
     
         <select id="villages" name="villages" disabled>
-            <option value="pilih-desa">Pilih Desa ...</option>
+            <option value="0">Pilih Desa ...</option>
         </select>
         <div id="mapid"></div>
     
@@ -47,7 +51,7 @@
             <table>
                 <tr>
                     <td>Periode</td>
-                    <td><input type="text" name="dates" id="inputCalendar" autocomplete="off" value="<?php echo date('m/d/Y', strtotime(date('Y-m-d') . ' - 10 day')) . " - " . date('m/d/Y'); ?>" readonly></td>
+                    <td><input type="text" name="dates" id="inputCalendar" autocomplete="off" value="<?php echo date('d/m/Y', strtotime(date('Y-m-d') . ' - 10 day')) . " - " . date('d/m/Y'); ?>" readonly></td>
                     <td><img src="img/calendar.png" id="calendar"></td>
                 </tr>
             </table>
@@ -81,6 +85,8 @@
    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
    <!-- CANVAS JS -->
    <script src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>
+   <!-- DevExtreme library -->
+   <script type="text/javascript" src="https://cdn3.devexpress.com/jslib/20.1.7/js/dx.all.js"></script>
    <!-- Datatables JS -->
    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
    <!-- rangepicker JS -->
@@ -90,6 +96,7 @@
    <script src="<?php echo BASEURL; ?>/js/heatmap.js"></script>
    <script src="<?php echo BASEURL; ?>/js/leaflet-heatmap.js"></script>
    <script src="<?php echo BASEURL; ?>/js/script.js"></script>
+   <script src="<?php echo BASEURL; ?>/js/testgraph.js"></script>
    <script src="<?php echo BASEURL; ?>/js/datatables.js"></script>
 </body>
 </html>

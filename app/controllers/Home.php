@@ -177,7 +177,25 @@ Class Home extends Controller {
             $data[$row['date_created']][$row['case_status']] = $row['total'];
         }
 
-        echo json_encode($data);
+        $all = [];
+
+        foreach ( $data as $key => $row ) {
+            ( isset($row['SUSPEK']) ) ? : $row['SUSPEK'] = '0';
+            ( isset($row['PROBABLE']) ) ? : $row['PROBABLE'] = '0';
+            ( isset($row['KONFIRMASI']) ) ? : $row['KONFIRMASI'] = '0';
+            ( isset($row['KONTAK_ERAT']) ) ? : $row['KONTAK_ERAT'] = '0';
+            $created_at = date("d M", strtotime($key));
+            $sub_array = [
+                'created_at' => $created_at,
+                'SUSPEK' => $row['SUSPEK'],
+                'PROBABLE' => $row['PROBABLE'],
+                'KONFIRMASI' => $row['KONFIRMASI'],
+                'KONTAK_ERAT' => $row['KONTAK_ERAT']
+            ];
+            $all[] = $sub_array;
+        }
+
+        echo json_encode($all);
     }
 
     // GET MARKERS BY VILLAGE ID
@@ -199,13 +217,25 @@ Class Home extends Controller {
 
     // INPUT COOR TO EACH TABLES
     public function getCoor() {
-        $search = 'Indonesia';
-        $get_data = $this->model('Home_model')->callApi('GET', 'https://api.mapbox.com/geocoding/v5/mapbox.places/' . $search . '.json?access_token=pk.eyJ1IjoicmFqYWZpa2hzYW4iLCJhIjoiY2tkbnh0cjZlMDJ4djJ5bzJuazM5YWs0MSJ9.s6_zk3KF7oTtuga9eXtLDQ', false);
-        $response = json_decode($get_data, true);
-        echo $response["features"]["0"]["center"]["0"];
+        $search = 'Jawa Barat';
+        $name = rawurlencode($search);
+        // $get_data = $this->model('Home_model')->callApi('GET', 'https://api.mapbox.com/geocoding/v5/mapbox.places/' . $name . '.json?access_token=pk.eyJ1IjoicmFqYWZpa2hzYW4iLCJhIjoiY2tkbnh0cjZlMDJ4djJ5bzJuazM5YWs0MSJ9.s6_zk3KF7oTtuga9eXtLDQ', false);
+        // $get_data = $this->model('Home_model')->callApi('GET', 'https://nominatim.openstreetmap.org/search?q=aceh&format=json&limit=1', false);
+        $json = "https://nominatim.openstreetmap.org/search?q=aceh&format=json&limit=1";
+        $ch = curl_init($json);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:59.0) Gecko/20100101 Firefox/59.0");
+        $jsonfile = curl_exec($ch);
+        curl_close($ch);
+
+        $response = json_decode($jsonfile, true);
+        // var_dump($response);
+        echo $response[0]['lon'];
     }
 
     public function inputCoor() {
-        $this->model('Home_model')->addLatLong('regencies');
+        $this->model('Home_model')->addLatLong('villages');
+        date_default_timezone_set("Asia/Bangkok");
+        echo "Refresh again at : " . date("H:i:s", time() + 70);
     }
 }

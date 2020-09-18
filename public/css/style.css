@@ -21,7 +21,7 @@
    speak for themselves. Background we set to 80% white with
    our animation centered, and no-repeating */
 #modal {
-    display:    block;
+    display:    none;
     position:   absolute;
     z-index:    999999;
     height:     370px;

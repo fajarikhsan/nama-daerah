@@ -53,47 +53,6 @@ $(document).ready(function() {
         heatmapLayer.setData(testData);
     });
 
-    // GRAPH
-    var options = {
-        animationEnabled: true,
-        theme: "light2",
-        zoomEnabled: true,
-        title: {
-            text: "Indonesia"
-        },
-        toolTip: {
-            shared: true
-        },
-        data: [
-            {
-                type: "splineArea",
-                name: "Total",
-                xValueFormatString: "DD MMM, YYYY",
-                showInLegend: "true"
-            },
-            {
-                type: "splineArea",
-                name: "SUSPEK",
-                showInLegend: "true"
-            },
-            {
-                type: "splineArea",
-                name: "PROBABLE",
-                showInLegend: "true"
-            },
-            {
-                type: "splineArea",
-                name: "KONFIRMASI",
-                showInLegend: "true"
-            },
-            {
-                type: "splineArea",
-                name: "KONTAK ERAT",
-                showInLegend: "true"
-            }
-        ]
-    };
-
     // FUNCTIONS
     // FUNCTION AJAX FOR GRAPH
     function changeGraph( id, record, start, end, name ) {
@@ -124,46 +83,62 @@ $(document).ready(function() {
                     $('#null').css('align-items', 'center');
                     $('#null').css('justify-content', 'center');
                 }
-                options.data[0].dataPoints = [];
-                options.data[1].dataPoints = [];
-                options.data[2].dataPoints = [];
-                options.data[3].dataPoints = [];
-                options.data[4].dataPoints = [];
-                options.title.text = name;
+                var chartCheck = $("#chartContainer").data("dxChart");
+                console.log(chartCheck);
+                if ( chartCheck != undefined ) {
+                    console.log("ADAAA");
+                    $("#chartContainer").empty();  
+                    $("#chartContainer").removeData();  
+                }
+                console.log(chartCheck);
 
-                $.each(data, function(i, val) {
-                    if ( typeof val.SUSPEK == 'undefined' )  val.SUSPEK = '0';
-                    if ( typeof val.PROBABLE == 'undefined' )  val.PROBABLE = '0';
-                    if ( typeof val.KONFIRMASI == 'undefined' )  val.KONFIRMASI = '0';
-                    if ( typeof val.KONTAK_ERAT == 'undefined' )  val.KONTAK_ERAT = '0';
-                    var date = i;
-                    var year = parseInt(date.substr(0, 4));
-                    var month = parseInt(date.substr(5, 2)) - 1;
-                    var day = parseInt(date.substr(8, 2));
-                    options.data[0].dataPoints.push({
-                        x: new Date(year, month, day),
-                        y: parseInt(val.SUSPEK) + parseInt(val.PROBABLE) + parseInt(val.KONFIRMASI) + parseInt(val.KONTAK_ERAT)
-                    });
-                    options.data[1].dataPoints.push({
-                        x: new Date(year, month, day),
-                        y: parseInt(val.SUSPEK)
-                    });
-                    options.data[2].dataPoints.push({
-                        x: new Date(year, month, day),
-                        y: parseInt(val.PROBABLE)
-                    });
-                    options.data[3].dataPoints.push({
-                        x: new Date(year, month, day),
-                        y: parseInt(val.KONFIRMASI)
-                    });
-                    options.data[4].dataPoints.push({
-                        x: new Date(year, month, day),
-                        y: parseInt(val.KONTAK_ERAT)
-                    });
-                    
+                $("#chartContainer").dxChart({
+                    title: name,
+                    dataSource: data,
+                    commonSeriesSettings: {
+                        type: "splineArea",
+                        argumentField: "created_at",
+                        opacity: 0.5
+                    },
+                    argumentAxis:{
+                        valueMarginsEnabled: false
+                    },
+                    series: [
+                        { valueField: "SUSPEK", name: "SUSPEK", point: { visible: true } },
+                        { valueField: "PROBABLE", name: "PROBABLE", point: { visible: true } },
+                        { valueField: "KONFIRMASI", name: "KONFIRMASI", point: { visible: true } },
+                        { valueField: "KONTAK_ERAT", name: "KONTAK_ERAT", point: { visible: true } }
+                    ],
+                    tooltip: {
+                        enabled: true,
+                        shared: true,
+                        format: {
+                            type: "largeNumber",
+                            precision: 1
+                        },
+                        customizeTooltip: function (arg) {
+                            var items = arg.valueText.split("\n"),
+                                color = arg.point.getColor();
+                            $.each(items, function(index, item) {
+                                if(item.indexOf(arg.seriesName) === 0) {
+                                    items[index] = $("<span>")
+                                                    .text(item)
+                                                    .addClass("active")
+                                                    .css("color", color)
+                                                    .prop("outerHTML");
+                                }
+                            });
+                            return { text: items.join("\n") };
+                        }
+                    },
+                    legend: {
+                        verticalAlignment: "bottom",
+                        horizontalAlignment: "center"
+                    },
+                    valueAxis: [{
+                        valueType: 'numeric'
+                    }]
                 });
-
-                (new CanvasJS.Chart("chartContainer", options).render());
             },
             complete:function(data){
                 // Hide image container
@@ -183,49 +158,47 @@ $(document).ready(function() {
        opens: 'left',
        autoUpdateInput: false,
        locale: {
-           cancelLabel: 'Clear'
+           cancelLabel: 'Clear',
+           format: 'DD/MM/YYYY'
        }
     }, function(start, end, label) {
        console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
       });
 
     $('#calendar').on('apply.daterangepicker', function(ev, picker) {
-        $('#inputCalendar').val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+        $('#inputCalendar').val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
         startDate = picker.startDate.format('YYYY-MM-DD');
         endDate = picker.endDate.format('YYYY-MM-DD');
-        if ( $('#villages').val() == 'pilih-desa' ) {
-            if ( $('#districts').val() == 'pilih-kecamatan' ) {
-                if ( $('#regencies').val() == 'pilih-kokab' ) {
-                    if ( $('#provinces').val() == 'pilih-provinsi' ) {
+        if ( $('#villages').val() == '0' ) {
+            if ( $('#districts').val() == '0' ) {
+                if ( $('#regencies').val() == '0' ) {
+                    if ( $('#provinces').val() == '0' ) {
                         var id = null;
                         var record = null;
                         var name = 'Indonesia';
                     } else {
                         var id = $('#provinces').val();
                         var record = 'province_id';
-                        var name = options.title.text;
+                        var name = $('#provinces option:selected').text();
                     }
                 } else {
                     var id = $('#regencies').val();
                     var record = 'regency_id';
-                    var name = options.title.text;
+                    var name = $('#regencies option:selected').text();
                 }
             } else {
                 var id = $('#districts').val();
                 var record = 'district_id';
-                var name = options.title.text;
+                var name = $('#districts option:selected').text();
             }
         } else {
             var id = $('#villages').val();
             var record = 'village_id';
-            var name = options.title.text;
+            var name = $('#villages option:selected').text();
         }
 
         changeGraph( id, record, startDate, endDate, name );
        
-    });
-  
-    $('#calendar').on('cancel.daterangepicker', function(ev, picker) {
     });
 
     
@@ -256,20 +229,14 @@ $(document).ready(function() {
 
         // check date
         var checkDate = $('input[name="dates"]').val();
-        if ( checkDate == '' || checkDate == null ) {
-            var start = null;
-            var end = null;
-        } else if ( checkDate.indexOf("/") == -1 ) {
-            var start = checkDate.substr(0, 10);
-            var end = checkDate.substr(13, 10);
-        } else {
-            var start = checkDate.substr(6,4) + '-' + checkDate.substr(0,2) + '-' + checkDate.substr(3,2);
-            var end = checkDate.substr(19,4) + '-' + checkDate.substr(13,2) + '-' + checkDate.substr(16,2);
-        }
+        var start = checkDate.substr(6,4) + '-' + checkDate.substr(3,2) + '-' + checkDate.substr(0,2);
+        var end = checkDate.substr(19,4) + '-' + checkDate.substr(16,2) + '-' + checkDate.substr(13,2);
+
+        console.log(start + ' ' + end);
     
         var id = $('#provinces').val();
         var record = 'province_id';
-        if ( id == 'pilih-provinsi') {
+        if ( id == '0') {
             id = null;
             record = null;
             // disable select regency
@@ -422,20 +389,12 @@ $(document).ready(function() {
 
         // check date
         var checkDate = $('input[name="dates"]').val();
-        if ( checkDate == '' || checkDate == null ) {
-            var start = null;
-            var end = null;
-        } else if ( checkDate.indexOf("/") == -1 ) {
-            var start = checkDate.substr(0, 10);
-            var end = checkDate.substr(13, 10);
-        } else {
-            var start = checkDate.substr(6,4) + '-' + checkDate.substr(0,2) + '-' + checkDate.substr(3,2);
-            var end = checkDate.substr(19,4) + '-' + checkDate.substr(13,2) + '-' + checkDate.substr(16,2);
-        }
+        var start = checkDate.substr(6,4) + '-' + checkDate.substr(3,2) + '-' + checkDate.substr(0,2);
+        var end = checkDate.substr(19,4) + '-' + checkDate.substr(16,2) + '-' + checkDate.substr(13,2);
         
         var id = $('#regencies').val();
         var record = 'regency_id';
-        if ( id == 'pilih-kokab' ) {
+        if ( id == '0' ) {
             // disable select district
             $('#districts').prop('disabled', true);
             // disable select village
@@ -525,18 +484,10 @@ $(document).ready(function() {
 
         // check date
         var checkDate = $('input[name="dates"]').val();
-        if ( checkDate == '' || checkDate == null ) {
-            var start = null;
-            var end = null;
-        } else if ( checkDate.indexOf("/") == -1 ) {
-            var start = checkDate.substr(0, 10);
-            var end = checkDate.substr(13, 10);
-        } else {
-            var start = checkDate.substr(6,4) + '-' + checkDate.substr(0,2) + '-' + checkDate.substr(3,2);
-            var end = checkDate.substr(19,4) + '-' + checkDate.substr(13,2) + '-' + checkDate.substr(16,2);
-        }
+        var start = checkDate.substr(6,4) + '-' + checkDate.substr(3,2) + '-' + checkDate.substr(0,2);
+        var end = checkDate.substr(19,4) + '-' + checkDate.substr(16,2) + '-' + checkDate.substr(13,2);
     
-        if ( id == 'pilih-kecamatan' ) {
+        if ( id == '0' ) {
             // disable select village
             $('#villages').prop('disabled', true);
 
@@ -622,18 +573,10 @@ $(document).ready(function() {
 
         // check date
         var checkDate = $('input[name="dates"]').val();
-        if ( checkDate == '' || checkDate == null ) {
-            var start = null;
-            var end = null;
-        } else if ( checkDate.indexOf("/") == -1 ) {
-            var start = checkDate.substr(0, 10);
-            var end = checkDate.substr(13, 10);
-        } else {
-            var start = checkDate.substr(6,4) + '-' + checkDate.substr(0,2) + '-' + checkDate.substr(3,2);
-            var end = checkDate.substr(19,4) + '-' + checkDate.substr(13,2) + '-' + checkDate.substr(16,2);
-        }
+        var start = checkDate.substr(6,4) + '-' + checkDate.substr(3,2) + '-' + checkDate.substr(0,2);
+        var end = checkDate.substr(19,4) + '-' + checkDate.substr(16,2) + '-' + checkDate.substr(13,2);
 
-        if ( id == 'pilih-desa') {
+        if ( id == '0') {
             $.ajax({
                 url: url + '/home/getDistrictCoordinate',
                 data: {id: $('#districts').val()},
@@ -660,7 +603,6 @@ $(document).ready(function() {
                 success: function(data) {
                     $.each(data, function (i, val) {
                         marker[i] = L.marker([val.lat, val.lng], {title: val.case_number}).addTo(mymap);
-                        // marker[i].bindPopup(val.case_number).openPopup();
                     });
                 }
             });

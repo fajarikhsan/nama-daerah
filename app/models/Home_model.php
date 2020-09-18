@@ -286,10 +286,10 @@ Class Home_model {
    // INSERT RANDOM COORDINATE
    public function insertRandomCoordinate() {
       $status = [
-         'SUSPEK',
-         'PROBABLE',
-         'KONFIRMASI',
-         'KONTAK_ERAT'
+         'SUSPEK' => 35,
+         'PROBABLE' => 30,
+         'KONFIRMASI' => 20,
+         'KONTAK_ERAT' => 15
       ];
 
       $location = $this->getAllDataVillages();
@@ -313,7 +313,7 @@ Class Home_model {
          $datetime = date('Y-m-d H:i:s', $randDate);
          
       
-         $person_status = $status[rand(0,3)];
+         $person_status = $this->getRandomWeightedElement( $status );
          $case_order = sprintf('%05d', rand(1, 65535));
          $case_number = $person_status.'-'.$regency.'-'.$case_order;
          $coordinate = $this->generate_random_point([$cur_location['lat'], $cur_location['lng']], 2);
@@ -411,6 +411,17 @@ Class Home_model {
       return array_map( 'rad2deg', array( $lat_rads, $lng_rads ) );
  }
 
+   function getRandomWeightedElement(array $weightedValues) {
+      $rand = mt_rand(1, (int) array_sum($weightedValues));
+
+      foreach ($weightedValues as $key => $value) {
+         $rand -= $value;
+         if ($rand <= 0) {
+            return $key;
+         }
+      }
+   }
+
    //  INPUT COORDINATE IN EACH TABLES
     public function callAPI($method, $url, $data){
         $curl = curl_init();
@@ -444,33 +455,55 @@ Class Home_model {
         return $result;
      }
 
+     public function NominatimAPI( $search ) {
+      $name = rawurlencode($search);
+      $json = "https://nominatim.openstreetmap.org/search?q=" . $name . "&format=json&limit=1";
+      $ch = curl_init($json);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:59.0) Gecko/20100101 Firefox/59.0");
+      $jsonfile = curl_exec($ch);
+      curl_close($ch);
+      $result = json_decode($jsonfile, true);
+
+      return $result;
+     }
+
      public function getAllNames($table, $offset) {
          $query = "SELECT *
-         FROM regencies
-         WHERE latitude < -11 OR latitude > 5.89
-         LIMIT 600 OFFSET :offset";
+         FROM villages
+         WHERE lat < -11 OR lat > 5.894";
          $this->db->query($query);
-         $this->db->bind('offset', $offset);
+         // $this->db->bind('offset', $offset);
          $this->db->execute();
          return $this->db->resultSet();
      }
 
      public function addLatLong($table) {
-         $data = $this->getAllNames('villages, districts', 0);
+         $data = $this->getAllNames($table, 0);
          
          foreach ( $data as $d ) {
-            $shell = $d['name'] . ' indonesia';
-            $name = rawurlencode($shell);
-            $get_data = $this->callApi('GET', 'https://api.mapbox.com/geocoding/v5/mapbox.places/' . $name . '.json?access_token=pk.eyJ1IjoicmFqYWZpa2hzYW4iLCJhIjoiY2tkbnh0cjZlMDJ4djJ5bzJuazM5YWs0MSJ9.s6_zk3KF7oTtuga9eXtLDQ', false);
-            $response = json_decode($get_data, true);
-            $long = $response["features"]["0"]["center"]["0"];
-            $lat = $response["features"]["0"]["center"]["1"];
-            $query = "UPDATE " . $table . " SET latitude = :latitude, longitude = :longitude WHERE id = :id";
+            // $shell = $d['name'];
+            // $name = rawurlencode($shell);
+            // $get_data = $this->callApi('GET', 'https://api.mapbox.com/geocoding/v5/mapbox.places/' . $name . '.json?access_token=pk.eyJ1IjoicmFqYWZpa2hzYW4iLCJhIjoiY2tkbnh0cjZlMDJ4djJ5bzJuazM5YWs0MSJ9.s6_zk3KF7oTtuga9eXtLDQ', false);
+            // $response = json_decode($get_data, true);
+            $name = $d['name'] . " indonesia";
+            // $cek_kota = substr($name, 0, 4);
+            // $cek_kabupaten = substr($name, 0, 9);
+            // if ( $cek_kota == "KOTA" ) {
+            //    $search = substr($name, 5) . " indonesia";
+            // } else if ( $cek_kabupaten == "KABUPATEN" ) {
+            //    $search = substr($name, 10) . " indonesia";
+            // }
+            $response = $this->NominatimAPI( $name );
+            $long = $response[0]['lon'];
+            $lat = $response[0]['lat'];
+            $query = "UPDATE " . $table . " SET lat = :latitude, lng = :longitude WHERE id = :id";
             $this->db->query($query);
             $this->db->bind('latitude', $lat);
             $this->db->bind('longitude', $long);
             $this->db->bind('id', $d['id']);
             $this->db->execute();
+            sleep(1);
          }
      }
 }
