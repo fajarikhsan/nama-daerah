@@ -84,13 +84,10 @@ $(document).ready(function() {
                     $('#null').css('justify-content', 'center');
                 }
                 var chartCheck = $("#chartContainer").data("dxChart");
-                console.log(chartCheck);
                 if ( chartCheck != undefined ) {
-                    console.log("ADAAA");
                     $("#chartContainer").empty();  
                     $("#chartContainer").removeData();  
                 }
-                console.log(chartCheck);
 
                 $("#chartContainer").dxChart({
                     title: name,
